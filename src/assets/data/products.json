@@ -32,7 +32,7 @@
         },
         {
             "product_name": "Nike Air Zoom Pegasus 38",
-            "category": "Clothing and Fashion",
+            "category": "Clothing",
             "price": 5995,
             "cost": 3800,
             "manufacturer": "Nike",
@@ -52,7 +52,7 @@
         },
         {
             "product_name": "Dyson V11 Absolute Cordless Vacuum",
-            "category": "Home and Living",
+            "category": "Home",
             "price": 34500,
             "cost": 28000,
             "manufacturer": "Dyson",
@@ -62,7 +62,7 @@
         },
         {
             "product_name": "Calvin Klein Men's Slim Fit Shirt",
-            "category": "Clothing and Fashion",
+            "category": "Clothing",
             "price": 2499,
             "cost": 1200,
             "manufacturer": "Calvin Klein",
@@ -82,7 +82,7 @@
         },
         {
             "product_name": "LEGO Star Wars Millennium Falcon",
-            "category": "Toys and Games",
+            "category": "Toys",
             "price": 15500,
             "cost": 11800,
             "manufacturer": "LEGO",
@@ -92,7 +92,7 @@
         },
         {
             "product_name": "Moleskine Classic Notebook",
-            "category": "Stationery and Office Supplies",
+            "category": "Stationery",
             "price": 899,
             "cost": 650,
             "manufacturer": "Moleskine",
@@ -142,7 +142,7 @@
         },
         {
             "product_name": "Adidas Ultraboost Running Shoes",
-            "category": "Clothing and Fashion",
+            "category": "Clothing",
             "price": 4995,
             "cost": 3700,
             "manufacturer": "Adidas",
@@ -172,7 +172,7 @@
         },
         {
             "product_name": "Ray-Ban Aviator Sunglasses",
-            "category": "Clothing and Fashion",
+            "category": "Clothing",
             "price": 3290,
             "cost": 2200,
             "manufacturer": "Ray-Ban",

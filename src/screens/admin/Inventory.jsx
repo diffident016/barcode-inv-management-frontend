@@ -69,10 +69,10 @@ function Inventory() {
     );
 
     return (
-        <div className='flex flex-row w-full h-full p-4 text-[#555C68] gap-4'>
-            <div className='flex flex-col flex-1 h-full rounded-lg border bg-white p-6 overflow-hidden'>
+        <div className='w-full h-full p-4 text-[#555C68]'>
+            <div className='flex flex-col flex-1 h-full rounded-lg border bg-white py-4 px-6 overflow-hidden'>
                 <h1 className='font-lato-black text-base'>Inventory</h1>
-                <div className='flex flex-row justify-between w-full items-center pt-4'>
+                <div className='flex flex-row justify-between w-full items-center pt-4 pb-2'>
                     <input
                         value={query}
                         onChange={(e) => {
@@ -108,7 +108,7 @@ function Inventory() {
                             })
                         }
                     </div>
-                    <div className='flex flex-col overflow-auto h-full w-full pb-12'>
+                    <div className='flex flex-col overflow-auto h-full w-full'>
                         {
                             products.map((item) => {
                                 return (

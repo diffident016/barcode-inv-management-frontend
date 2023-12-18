@@ -27,7 +27,7 @@
         },
         {
             "category_id": 3,
-            "category_name": "Clothing and Fashion",
+            "category_name": "Clothing",
             "subcategories": [
                 "Men's Apparel",
                 "Women's Apparel",
@@ -39,7 +39,7 @@
         },
         {
             "category_id": 4,
-            "category_name": "Home and Living",
+            "category_name": "Home",
             "subcategories": [
                 "Furniture",
                 "Bedding and Linens",
@@ -51,7 +51,7 @@
         },
         {
             "category_id": 5,
-            "category_name": "Grocery and Household",
+            "category_name": "Grocery",
             "subcategories": [
                 "Dry and Canned Goods",
                 "Fresh Produce",
@@ -63,7 +63,7 @@
         },
         {
             "category_id": 6,
-            "category_name": "Health and Beauty",
+            "category_name": "Health",
             "subcategories": [
                 "Skincare",
                 "Hair Care",
@@ -75,7 +75,7 @@
         },
         {
             "category_id": 7,
-            "category_name": "Sports and Outdoor",
+            "category_name": "Sports",
             "subcategories": [
                 "Sports Equipment",
                 "Outdoor Gear",
@@ -86,7 +86,7 @@
         },
         {
             "category_id": 8,
-            "category_name": "Toys and Games",
+            "category_name": "Toys",
             "subcategories": [
                 "Board Games",
                 "Educational Toys",
@@ -97,7 +97,7 @@
         },
         {
             "category_id": 9,
-            "category_name": "Stationery and Office Supplies",
+            "category_name": "Stationery",
             "subcategories": [
                 "Notebooks",
                 "Pens and Pencils",
@@ -118,7 +118,7 @@
         },
         {
             "category_id": 11,
-            "category_name": "Books and Magazines",
+            "category_name": "Books",
             "subcategories": [
                 "Fiction Books",
                 "Non-fiction Books",
