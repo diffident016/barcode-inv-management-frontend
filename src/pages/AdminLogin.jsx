@@ -1,64 +1,33 @@
 import React, { useState } from 'react'
-import { BASEURL } from '../../config';
 import banner from '../assets/images/Barcode-bro.png'
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from '../auth/AuthContext';
 import { CircularProgress } from '@mui/material';
+import { useAuth } from '../auth/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
-function Login() {
+function AdminLogin() {
 
-    const [error, setError] = useState();
     const [email, setEmail] = useState('');
-    const [onLogin, setOnLogin] = useState(false);
     const [password, setPassword] = useState('');
-
-    const navigate = useNavigate();
+    const [onLogin, setOnLogin] = useState(false);
+    const [error, setError] = useState('');
     const { login } = useAuth();
 
-    const loginUser = (e) => {
-        e.preventDefault();
+    const navigate = useNavigate()
 
-        const user = {
-            'email': email,
-            'password': password
-        }
+    const loginUser = async (e) => {
+        e.preventDefault()
 
-        setError(null)
         setOnLogin(true)
+        setError('');
 
-        fetch(`${BASEURL}/api/login`, {
-            method: "POST",
-            headers: {
-                "Content-type": "application/json",
-            },
-            body: JSON.stringify(user),
-        })
-            .then(async (result) => {
-                if (result.status == 200) {
-                    fetch(`${BASEURL}/api/login`)
-                        .then((response) => response.json())
-                        .then((data) => {
-                            setOnLogin(false)
-                            localStorage.setItem("user", JSON.stringify(data));
-                            login(data._id, () => {
-                                navigate("/");
-                            });
-                        })
-                        .catch((err) => {
-                            setOnLogin(false)
-                            setError('Something went wrong.')
-                        });
-                } else {
-                    setOnLogin(false)
-                    setError('Invalid email or password.')
-                }
-            })
-            .catch((error) => {
-                setOnLogin(false)
-                setError('Something went wrong.')
-                console.log("Something went wrong ", error);
-            });
-    };
+        try {
+            await login(email, password);
+            navigate('/admin')
+        } catch (e) {
+            console.log(e);
+            setError('Invalid email or password.')
+        }
+    }
 
     return (
         <div className='w-full h-screen'>
@@ -69,7 +38,7 @@ function Login() {
                 <div className='flex-1 flex items-center justify-center h-full w-full '>
                     <div className='flex flex-col items-center border rounded-lg shadow-sm pt-10 w-[450px] h-[500px]'>
                         <h1 className='font-lato-bold text-2xl text-[#1F2F3D]'>LOGIN</h1>
-                        <p className='font-lato py-4'>Enter your email and password to Log In.</p>
+                        <p className='font-lato py-4'>Enter your admin credentials to Log In.</p>
                         <div className='z-10 pt-8 flex flex-col w-[500px] h-full items-center'>
                             <form onSubmit={loginUser} className='flex flex-col z-10 w-[350px] py-2 font-lato-bold text-[#1F2F3D]'>
                                 <label className='py-2 text-sm'>Email Address</label>
@@ -103,4 +72,4 @@ function Login() {
     )
 }
 
-export default Login
+export default AdminLogin

@@ -2,7 +2,7 @@ import React from 'react'
 import SalesOverview from '../../components/SalesOverview'
 import PurchaseOverview from '../../components/PurchaseOverview'
 import UsersOverview from '../../components/UsersOverview'
-import SalesForcast from '../../components/SalesForcast'
+import SalesForecast from '../../components/SalesForecast'
 import {
     forecastIcon,
     growthIcon
@@ -10,14 +10,14 @@ import {
 
 function Dashboard() {
     return (
-        <div className='flex flex-col h-full overflow-auto p-4 gap-4 text-[#555C68]'>
-            <div className='h-[180px] w-full flex flex-row gap-4 '>
+        <div className='flex flex-col h-full overflow-auto p-4 gap-2 text-[#555C68]'>
+            <div className='h-[180px] w-full flex flex-row gap-2 '>
                 <SalesOverview />
                 <PurchaseOverview />
                 <UsersOverview />
             </div>
-            <div className='flex flex-row w-full h-full gap-4'>
-                <SalesForcast />
+            <div className='flex flex-row w-full h-full gap-2'>
+                <SalesForecast />
                 <div className='flex flex-col w-[300px] h-full bg-white border rounded-lg p-4'>
                     <h1 className='font-lato-bold text-sm'>Actual Sales</h1>
                     <div className='flex w-full flex-row py-6 px-2'>

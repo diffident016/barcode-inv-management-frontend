@@ -42,7 +42,7 @@ function Navbar({ user }) {
                     id="basic-menu"
                     anchorEl={anchorEl}
                     open={open}
-                    dense
+                    dense={true}
                     onClose={() => {
                         setAnchorEl(null)
                     }}

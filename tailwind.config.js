@@ -10,7 +10,8 @@ export default {
         'lato': ['Lato'],
         'lato-bold': ['Lato-bold'],
         'lato-light': ['Lato-light'],
-        'lato-black': ['Lato-black']
+        'lato-black': ['Lato-black'],
+        'cinzel': ['Cinzel']
       }
     },
   },

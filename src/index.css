@@ -22,6 +22,11 @@
     src: url('./assets/fonts/Lato-Black.ttf');
 }
 
+@font-face {
+    font-family: 'Cinzel';
+    src: url('./assets/fonts/Cinzel-Variable.ttf');
+}
+
 @layer base {
     body {
         @apply bg-[#f5f7f8];

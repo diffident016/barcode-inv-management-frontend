@@ -1,8 +1,9 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from './auth/AuthContext'
-import Login from './pages/Login'
-import Homepage from './pages/Homepage'
+import AdminHomepage from './pages/AdminHomepage'
 import PrivateRoute from './components/PrivateRoute'
+import AdminLogin from './pages/AdminLogin'
+import Homepage from './pages/Homepage'
 
 function App() {
 
@@ -11,13 +12,13 @@ function App() {
       <BrowserRouter>
         <AuthProvider >
           <Routes>
-            <Route path="/" element={
-              <PrivateRoute >
-                <Homepage />
-              </PrivateRoute>
+            <Route path='/' element={
+              <Homepage />
             } />
-            <Route path="/login" element={
-              <Login />
+            <Route path="/admin" element={
+              <PrivateRoute >
+                <AdminHomepage />
+              </PrivateRoute>
             } />
           </Routes>
         </AuthProvider>

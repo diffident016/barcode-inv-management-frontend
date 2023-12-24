@@ -12,7 +12,7 @@ import {
 } from 'recharts';
 
 
-function SalesForcast() {
+function SalesForecast() {
 
     const data = [
         {
@@ -133,4 +133,4 @@ function SalesForcast() {
     )
 }
 
-export default SalesForcast
+export default SalesForecast

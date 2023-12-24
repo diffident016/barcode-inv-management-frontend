@@ -1,45 +1,39 @@
 import React, { useState } from 'react'
-import { useAuth } from '../auth/AuthContext'
-import Sidebar from './Sidebar';
-import Dashboard from '../screens/admin/Dashboard';
-import {
-    Squares2X2Icon,
-    CubeIcon,
-    ShoppingCartIcon,
-    ArrowTrendingUpIcon,
-    UserGroupIcon
-} from '@heroicons/react/24/outline'
-import Inventory from '../screens/admin/Inventory';
-import Purchase from '../screens/admin/Purchase';
-import Sales from '../screens/admin/Sales';
-import Customers from '../screens/admin/Customers';
-import Navbar from './Navbar';
+import Products from '../screens/customers/Products'
+import ShoppingCart from '../screens/customers/ShoppingCart'
+import { CubeIcon, ShoppingBagIcon, ShoppingCartIcon } from '@heroicons/react/24/outline'
+import Orders from '../screens/customers/Orders'
+import Sidebar from './Sidebar'
 
 function Homepage() {
 
-    const { currentUser, logout } = useAuth();
-    const user = JSON.parse(localStorage.getItem("user"));
-    const [screen, setScreen] = useState(0);
+    const [screen, setScreen] = useState(0)
 
     const screens = [
-        { label: 'Dashboard', component: <Dashboard />, icon: <Squares2X2Icon />, header: '' },
-        { label: 'Inventory', component: <Inventory />, icon: <CubeIcon />, header: '' },
-        { label: 'Purchase', component: <Purchase />, icon: <ShoppingCartIcon />, header: '' },
-        { label: 'Sales', component: <Sales />, icon: <ArrowTrendingUpIcon />, header: '' },
-        { label: 'Customers', component: <Customers />, icon: <UserGroupIcon />, header: '' }
+        { label: 'Products', component: <Products />, icon: <ShoppingBagIcon />, header: '' },
+        { label: 'Shopping Cart', component: <ShoppingCart />, icon: <ShoppingCartIcon />, header: '' },
+        { label: 'Orders', component: <Orders />, icon: <CubeIcon />, header: '' }
     ]
 
     return (
-        <div className='flex flex-col h-screen w-full font-lato'>
-            <Navbar user={user} />
-            <div className='flex flex-row h-full w-full overflow-hidden'>
-                <Sidebar screens={screens} screen={screen} setScreen={setScreen} />
-                <div className='h-full w-full'>
+        <div className='w-full h-screen'>
+            <div className='flex flex-row h-full w-full p-4 gap-4 overflow-hidden font-lato text-[#555C68]'>
+                <div className='w-[20%] h-full bg-white shadow-sm border rounded-lg p-4'>
+                    <div className='flex justify-center h-20 w-full py-2'>
+                        <h1 className='cursor-pointer text-center font-cinzel font-extrabold text-xl text-[#1F2F3D]'>Sample Store</h1>
+                    </div>
+                    <Sidebar screens={screens} screen={screen} setScreen={setScreen} />
+                </div>
+                <div className='flex flex-col w-full h-full'>
+                    <div className='flex flex-row w-full h-16 bg-white border rounded-lg shadow-sm items-center px-10'>
+                        <h1 className='h-16'></h1>
+                    </div>
                     {screens[screen].component}
                 </div>
-            </div>
-        </div>
 
+            </div>
+
+        </div>
     )
 }
 
