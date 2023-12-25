@@ -2,12 +2,15 @@ import React, { useState, useMemo, useEffect } from 'react'
 import category from '../../assets/data/category.json'
 import { getAllProducts } from '../../api/product_api';
 import barcode from '../../assets/images/barcode.png'
+import { Backdrop } from '@mui/material';
+import ShowProduct from './ShowProduct';
 
 function Products() {
 
     const [query, setQuery] = useState('');
     const [filter, setFilter] = useState('Filter by category')
     const [products, setProducts] = useState([]);
+    const [showProduct, setShowProduct] = useState(null);
 
     const categories = useMemo(() => category['categories'].map((cat) => {
         return {
@@ -73,7 +76,9 @@ function Products() {
                     {
                         products.map((item) => {
                             return (
-                                <div key={item._id} className='cursor-pointer hover:ring-1 ring-[#ffc100] flex flex-col bg-white items-center h-[250px] w-full border rounded-lg shadow-sm p-4'>
+                                <div key={item._id}
+                                    onClick={() => { setShowProduct(item) }}
+                                    className='cursor-pointer hover:ring-1 ring-[#ffc100] flex flex-col bg-white items-center h-[250px] w-full border rounded-lg shadow-sm p-4'>
                                     <div className='w-full h-28 flex justify-center'>
                                         <img src={item.photoUrl} alt={item.name} className='h-32 w-32 object-cover' />
                                     </div>
@@ -81,11 +86,11 @@ function Products() {
                                         <h1 className='font-lato-bold leading-none'>{item.name}</h1>
                                     </div>
                                     <div className='mt-2 flex flex-row w-full justify-between'>
-                                        <h1 className='font-lato-bold'>{item.price.toLocaleString('en-US', {
+                                        <p className='font-lato-bold text-sm'>{item.price.toLocaleString('en-US', {
                                             style: 'currency',
                                             currency: 'PHP',
-                                        })}</h1>
-                                        <h1 className='px-2'>Stock: <span className='font-lato-bold'>{item.available}</span></h1>
+                                        })}</p>
+                                        <p className='px-2 text-sm'>Stock: <span className='font-lato-bold'>{item.available}</span></p>
                                     </div>
                                 </div>
                             )
@@ -93,6 +98,12 @@ function Products() {
                     }
                 </div>
             </div>
+            <Backdrop
+                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={!!showProduct}
+            >
+                {!!showProduct && <ShowProduct product={showProduct} action={() => { setShowProduct(null) }} />}
+            </Backdrop>
         </div>
     )
 }
