@@ -6,11 +6,13 @@ import { configureStore } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
 import userReducer from "./states/user.jsx";
 import alertReducer from "./states/alerts.jsx"
+import customerReducer from './states/customer.jsx'
 
 const store = configureStore({
   reducer: {
     user: userReducer,
-    alert: alertReducer
+    alert: alertReducer,
+    customer: customerReducer
   },
 });
 

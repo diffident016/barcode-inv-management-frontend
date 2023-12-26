@@ -1,8 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialStateValue = {
-    _id: "",
-    authId: "",
+    _id: null,
     firstName: "",
     lastName: "",
     email: "",
@@ -11,12 +10,12 @@ const initialStateValue = {
     imageUrl: ""
 };
 
-export const userSlice = createSlice({
-    name: "user",
+export const customerSlice = createSlice({
+    name: "customer",
     initialState: { value: initialStateValue },
     reducers: {
         login: (state, action) => {
-            localStorage.setItem("user", JSON.stringify(action.payload));
+            localStorage.setItem("customer", JSON.stringify(action.payload));
             state.value = action.payload;
         },
 
@@ -26,6 +25,6 @@ export const userSlice = createSlice({
     },
 });
 
-export const { login, logout } = userSlice.actions;
+export const { login, logout } = customerSlice.actions;
 
-export default userSlice.reducer;
+export default customerSlice.reducer;

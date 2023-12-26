@@ -1,16 +1,15 @@
 import React from 'react'
 import logo from '../assets/images/icon.png'
 import { Cog6ToothIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline'
-import { ListItemIcon, ListItemText, Menu, MenuItem, MenuList } from '@mui/material';
+import { ListItemIcon, Menu, MenuItem, MenuList } from '@mui/material';
 import { useAuth } from '../auth/AuthContext';
-
 
 function Navbar({ user }) {
 
     const [anchorEl, setAnchorEl] = React.useState(null);
     const open = Boolean(anchorEl);
 
-    const { logout } = useAuth();
+    const { signout } = useAuth();
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -50,7 +49,7 @@ function Navbar({ user }) {
                     <MenuList className='focus:outline-none'>
                         <MenuItem
                             onClick={() => {
-                                logout();
+                                signout();
                             }}>
                             <ListItemIcon>
                                 <ArrowRightOnRectangleIcon className='w-5' />

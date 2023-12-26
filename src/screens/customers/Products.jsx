@@ -5,7 +5,7 @@ import barcode from '../../assets/images/barcode.png'
 import { Backdrop } from '@mui/material';
 import ShowProduct from './ShowProduct';
 
-function Products() {
+function Products({ signUp }) {
 
     const [query, setQuery] = useState('');
     const [filter, setFilter] = useState('Filter by category')
@@ -102,7 +102,7 @@ function Products() {
                 sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
                 open={!!showProduct}
             >
-                {!!showProduct && <ShowProduct product={showProduct} action={() => { setShowProduct(null) }} />}
+                {!!showProduct && <ShowProduct signUp={signUp} product={showProduct} action={() => { setShowProduct(null) }} />}
             </Backdrop>
         </div>
     )

@@ -1,31 +1,24 @@
 import React from 'react'
 import { useAuth } from '../auth/AuthContext';
-import { Navigate, useLocation } from 'react-router-dom';
-import { useDispatch } from "react-redux";
-import { login } from '../states/user';
-import { getUser } from '../api/user_api';
 import AdminLogin from '../pages/AdminLogin';
+import AdminHomepage from '../pages/AdminHomepage';
+import { useSelector } from 'react-redux';
+import { Navigate, useLocation } from 'react-router-dom';
 
 function PrivateRoute({ children }) {
 
     const { currentUser } = useAuth();
+    const { pathname } = useLocation();
+    const user = useSelector((state) => state.user.value);
 
-    const dispatch = useDispatch();
+    if (!currentUser || !user.userType) {
 
-    console.log(currentUser)
+        if (pathname !== '/admin') return children;
 
-    if (!currentUser) {
-        return <AdminLogin />
+        return <Navigate to='/login' replace />
     }
 
-    getUser(currentUser.uid).then((response) => response.json())
-        .then((user) => {
-            dispatch(login(user))
-        }).catch((err) => {
-            console.log(err);
-        })
-
-    return children
+    return user.userType.typeId == 1 ? <AdminHomepage /> : <AdminLogin />
 }
 
 export default PrivateRoute

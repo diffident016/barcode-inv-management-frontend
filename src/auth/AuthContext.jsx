@@ -5,6 +5,8 @@ import {
     signInWithEmailAndPassword,
     signOut,
 } from 'firebase/auth'
+import { useDispatch } from "react-redux";
+import { logout } from '../states/user';
 
 const AuthContext = React.createContext()
 
@@ -15,16 +17,19 @@ export function useAuth() {
 export function AuthProvider({ children }) {
     const [currentUser, setCurrentUser] = useState()
     const [loading, setLoading] = useState(true)
+    const dispatch = useDispatch();
 
     function signup(email, password) {
         return createUserWithEmailAndPassword(auth, email, password)
     }
 
-    function login(email, password) {
+    function signin(email, password) {
         return signInWithEmailAndPassword(auth, email, password)
     }
 
-    function logout() {
+    function signout() {
+        localStorage.removeItem("user");
+        dispatch(logout())
         return signOut(auth)
     }
 
@@ -51,8 +56,8 @@ export function AuthProvider({ children }) {
 
     const value = {
         currentUser,
-        login,
-        logout
+        signin,
+        signout
     }
 
     return (

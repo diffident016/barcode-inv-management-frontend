@@ -1,8 +1,9 @@
 import { MinusCircleIcon, MinusIcon, PlusCircleIcon, PlusIcon, ShoppingBagIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import React from 'react'
+import React, { useState } from 'react'
 
-function ShowProduct({ product, action }) {
+function ShowProduct({ product, action, signUp }) {
 
+    const [quantity, setQuantity] = useState(1);
 
     return (
         <div className='w-[800px] h-[500px] bg-[#f5f7f8] rounded-lg'>
@@ -25,13 +26,13 @@ function ShowProduct({ product, action }) {
                             style: 'currency',
                             currency: 'PHP',
                         })}</p>
-                        <div className='py-3 flex flex-row justify-between'>
+                        <div className='py-3 flex flex-row justify-between select-none'>
                             <div className='flex flex-col'>
                                 <p className='pt-3 font-lato-bold text-xs opacity-90'>QUANTITY</p>
                                 <div className='my-1 items-center flex flex-row max-w-min py-1 px-2 border rounded-[15px] shadow-sm'>
-                                    <MinusIcon className='w-4 ' />
-                                    <p className='w-8 bg-white text-center font-lato-bold'>0</p>
-                                    <PlusIcon className='w-4' />
+                                    <MinusIcon onClick={() => { if (quantity > 1) { setQuantity(quantity - 1) } }} className={`w-4 cursor-pointer text-[#1F2F3D]`} />
+                                    <p className='w-8 bg-white text-center  font-lato-bold'>{quantity}</p>
+                                    <PlusIcon onClick={() => { if (quantity < product.available) { setQuantity(quantity + 1) } }} className={`w-4 cursor-pointer text-[#1F2F3D]`} />
                                 </div>
                             </div>
                             <div className='flex flex-col'>
@@ -42,7 +43,11 @@ function ShowProduct({ product, action }) {
                             </div>
                         </div>
                         <div className='py-3 flex flex-row justify-between gap-4 font-lato-bold text-sm'>
-                            <button className='w-full text-[#ffc100]  h-10 border border-[#ffc100] rounded-lg shadow-sm'>Add to Cart</button>
+                            <button
+                                onClick={() => {
+                                    signUp(true)
+                                }}
+                                className='w-full text-[#ffc100]  h-10 border border-[#ffc100] rounded-lg shadow-sm'>Add to Cart</button>
                             <button className='w-full h-10 shadow-sm rounded-lg bg-[#ffc100]'>Checkout</button>
                         </div>
                     </div>

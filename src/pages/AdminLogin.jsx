@@ -3,6 +3,9 @@ import banner from '../assets/images/Barcode-bro.png'
 import { CircularProgress } from '@mui/material';
 import { useAuth } from '../auth/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { getUser } from '../api/user_api';
+import { useDispatch } from "react-redux";
+import { login } from '../states/user';
 
 function AdminLogin() {
 
@@ -10,9 +13,21 @@ function AdminLogin() {
     const [password, setPassword] = useState('');
     const [onLogin, setOnLogin] = useState(false);
     const [error, setError] = useState('');
-    const { login } = useAuth();
+    const { signin, currentUser } = useAuth();
 
     const navigate = useNavigate()
+    const dispatch = useDispatch();
+
+    const getUserData = async (uid) => {
+        return getUser(uid)
+            .then((res) => res.json())
+            .then((data) => data)
+            .catch((err) => {
+                setError('Something went wrong, try again.')
+                setOnLogin(false)
+                console.log(err)
+            });
+    }
 
     const loginUser = async (e) => {
         e.preventDefault()
@@ -21,11 +36,18 @@ function AdminLogin() {
         setError('');
 
         try {
-            await login(email, password);
-            navigate('/admin')
+            await signin(email, password);
+
+            setTimeout(await getUserData(currentUser.uid).then((user) => {
+                console.log(user)
+                dispatch(login(user))
+                navigate('/admin');
+            }), 2000)
+
         } catch (e) {
             console.log(e);
             setError('Invalid email or password.')
+            setOnLogin(false)
         }
     }
 
