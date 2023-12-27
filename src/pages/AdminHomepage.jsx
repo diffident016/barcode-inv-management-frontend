@@ -1,22 +1,19 @@
 import React, { useState } from 'react'
-import { useAuth } from '../auth/AuthContext'
 import Dashboard from '../screens/admin/Dashboard';
 import {
     Squares2X2Icon,
     CubeIcon,
     ShoppingCartIcon,
     ArrowTrendingUpIcon,
-    UserGroupIcon
 } from '@heroicons/react/24/outline'
 import Inventory from '../screens/admin/Inventory';
 import Purchase from '../screens/admin/Purchase';
 import Sales from '../screens/admin/Sales';
-import Customers from '../screens/admin/Customers';
-import Navbar from './Navbar';
 import { Alert, Snackbar } from '@mui/material';
 import { useDispatch, useSelector } from "react-redux";
 import { hide } from '../states/alerts';
 import AdminSidebar from './AdminSidebar';
+import AdminNavbar from './AdminNavbar';
 
 function AdminHomepage() {
 
@@ -30,12 +27,11 @@ function AdminHomepage() {
         { label: 'Inventory', component: <Inventory user={user} />, icon: <CubeIcon />, header: '' },
         { label: 'Purchase', component: <Purchase />, icon: <ShoppingCartIcon />, header: '' },
         { label: 'Sales', component: <Sales />, icon: <ArrowTrendingUpIcon />, header: '' },
-        { label: 'Customers', component: <Customers />, icon: <UserGroupIcon />, header: '' }
     ]
 
     return (
         <div className='flex flex-col h-screen w-full font-lato'>
-            <Navbar user={user} />
+            <AdminNavbar user={user} />
             <div style={{ height: "calc(100% - 64px)" }} className='flex flex-row w-full '>
                 <AdminSidebar screens={screens} screen={screen} setScreen={setScreen} />
                 <div className='h-full w-full'>

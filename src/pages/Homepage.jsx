@@ -1,16 +1,23 @@
 import React, { useState } from 'react'
 import Products from '../screens/customers/Products'
 import ShoppingCart from '../screens/customers/ShoppingCart'
-import { CubeIcon, ShoppingBagIcon, ShoppingCartIcon } from '@heroicons/react/24/outline'
+import { Cog6ToothIcon, CubeIcon, ShoppingBagIcon, ShoppingCartIcon } from '@heroicons/react/24/outline'
 import Orders from '../screens/customers/Orders'
 import Sidebar from './Sidebar'
 import { Backdrop } from '@mui/material'
 import CustomerSignup from '../screens/customers/CustomerSignup'
+import { Alert, Snackbar } from '@mui/material';
+import { useDispatch, useSelector } from "react-redux";
+import { hide } from '../states/alerts';
+import Navbar from './Navbar'
 
 function Homepage() {
 
     const [screen, setScreen] = useState(0);
     const [isSignUp, setSignUp] = useState(false);
+    const dispatch = useDispatch();
+    const alert = useSelector((state) => state.alert.value);
+    const customer = useSelector((state) => state.customer.value);
 
     const screens = [
         { label: 'Products', component: <Products signUp={setSignUp} />, icon: <ShoppingBagIcon />, header: 'Welcome, customer!' },
@@ -28,14 +35,7 @@ function Homepage() {
                     <Sidebar screens={screens} screen={screen} setScreen={setScreen} />
                 </div>
                 <div className='flex flex-col w-full h-full'>
-                    <div className='w-full bg-white border rounded-lg shadow-sm'>
-                        <div className='w-full h-16 flex flex-row items-center px-4 justify-between'>
-                            <h1 className='font-lato-bold'>{screens[screen].header}</h1>
-                            <div className='flex flex-row'>
-                                <button className='w-28 p-1 rounded-lg font-lato-bold text-base bg-[#ffc100]'>Login</button>
-                            </div>
-                        </div>
-                    </div>
+                    <Navbar screen={screens[screen]} user={customer} signin={() => { setSignUp(true) }} />
                     {screens[screen].component}
                 </div>
                 <Backdrop sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
@@ -44,7 +44,14 @@ function Homepage() {
                     <CustomerSignup close={() => { setSignUp(false) }} />
                 </Backdrop>
             </div>
-
+            {alert.show && <Snackbar
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                open={alert.show}
+                autoHideDuration={alert.duration}
+                onClose={() => { dispatch(hide()) }}
+            >
+                <Alert severity={alert.type}>{alert.message}</Alert>
+            </Snackbar>}
         </div>
     )
 }

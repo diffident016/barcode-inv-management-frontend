@@ -7,6 +7,8 @@ import customerIcon from './images/customer.png'
 import storeIcon from './images/store.png'
 import growthIcon from './images/growth.png'
 import forecastIcon from './images/forecast.png'
+import pendingIcon from './images/pending.png'
+import completedIcon from './images/completed.png'
 
 export {
     salesIcon,
@@ -17,5 +19,7 @@ export {
     customerIcon,
     storeIcon,
     growthIcon,
-    forecastIcon
+    forecastIcon,
+    pendingIcon,
+    completedIcon
 }

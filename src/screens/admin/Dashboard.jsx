@@ -14,7 +14,6 @@ function Dashboard() {
             <div className='h-[180px] w-full flex flex-row gap-2 '>
                 <SalesOverview />
                 <PurchaseOverview />
-                <UsersOverview />
             </div>
             <div className='flex flex-row w-full h-full gap-2'>
                 <SalesForecast />

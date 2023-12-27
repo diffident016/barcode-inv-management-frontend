@@ -14,17 +14,18 @@ export const customerSlice = createSlice({
     name: "customer",
     initialState: { value: initialStateValue },
     reducers: {
-        login: (state, action) => {
+        customerLogin: (state, action) => {
             localStorage.setItem("customer", JSON.stringify(action.payload));
             state.value = action.payload;
         },
 
         logout: (state) => {
+            localStorage.removeItem("customer");
             state.value = initialStateValue;
         },
     },
 });
 
-export const { login, logout } = customerSlice.actions;
+export const { customerLogin, logout } = customerSlice.actions;
 
 export default customerSlice.reducer;

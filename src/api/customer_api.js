@@ -1,7 +1,7 @@
 import { BASEURL } from '../../config'
 
 const registerCustomer = (customer) => {
-    return fetch(`${BASEURL}/customer/register`, {
+    return fetch(`${BASEURL}/api/customer/register`, {
         method: "POST",
         headers: {
             "Content-type": "application/json",
@@ -11,4 +11,15 @@ const registerCustomer = (customer) => {
     });
 }
 
-export { registerCustomer }
+const loginCustomer = (credentials) => {
+    return fetch(`${BASEURL}/api/customer/login`, {
+        method: "POST",
+        headers: {
+            "Content-type": "application/json",
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify(credentials),
+    });
+}
+
+export { registerCustomer, loginCustomer }

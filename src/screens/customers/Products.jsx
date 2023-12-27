@@ -5,7 +5,7 @@ import barcode from '../../assets/images/barcode.png'
 import { Backdrop } from '@mui/material';
 import ShowProduct from './ShowProduct';
 
-function Products({ signUp }) {
+function Products({ signUp, user }) {
 
     const [query, setQuery] = useState('');
     const [filter, setFilter] = useState('Filter by category')
@@ -25,10 +25,10 @@ function Products({ signUp }) {
                 if (!data) return null;
 
                 const products = data.map((item) => {
-                    var item = item;
+                    var newItem = item;
 
-                    item['selected'] = false
-                    return item
+                    newItem['selected'] = false
+                    return newItem
                 });
 
                 setProducts(products)

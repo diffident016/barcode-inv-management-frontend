@@ -9,10 +9,12 @@ import Loader from './components/Loader'
 import { pingServer } from './api/user_api'
 import { useDispatch } from "react-redux";
 import { login } from './states/user';
+import { customerLogin } from './states/customer'
 
 function App() {
 
   let user = JSON.parse(localStorage.getItem("user"));
+  let customer = JSON.parse(localStorage.getItem("customer"));
 
   const [isLoading, setLoading] = useState(true);
   const dispatch = useDispatch();
@@ -35,6 +37,7 @@ function App() {
 
   const checkUser = () => {
     if (user) dispatch(login(user))
+    if (customer) dispatch(customerLogin(customer))
   }
 
   if (isLoading) {
