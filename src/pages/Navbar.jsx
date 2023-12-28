@@ -7,10 +7,11 @@ import { logout } from '../states/customer'
 function Navbar({ user, screen, signin }) {
 
     const [anchorEl, setAnchorEl] = useState(null);
-    const open = Boolean(anchorEl);
+    const [open, setOpen] = useState(false);
     const dispatch = useDispatch();
 
     const handleClick = (event) => {
+        setOpen(true);
         setAnchorEl(event.currentTarget);
     };
 
@@ -29,7 +30,7 @@ function Navbar({ user, screen, signin }) {
                             <img
                                 alt="Profile"
                                 src={user.imageUrl}
-                                className="h-8 w-8 rounded-full object-cover"
+                                className="h-10 w-10 rounded-full object-cover"
                             />
                             <p className='text-[#555C68] text-sm font-lato-bold'>{user.name}</p>
                         </div>
@@ -38,6 +39,7 @@ function Navbar({ user, screen, signin }) {
                 }
             </div>
             <Menu
+                className='ml-[-10px]'
                 id="customer-logout"
                 anchorEl={anchorEl}
                 open={open}
@@ -49,6 +51,7 @@ function Navbar({ user, screen, signin }) {
                 <MenuList className='focus:outline-none'>
                     <MenuItem
                         onClick={() => {
+                            setOpen(false);
                             dispatch(logout())
                         }}>
                         <ListItemIcon>

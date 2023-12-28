@@ -1,9 +1,79 @@
 import { MinusCircleIcon, MinusIcon, PlusCircleIcon, PlusIcon, ShoppingBagIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { CircularProgress } from '@mui/material';
 import React, { useState } from 'react'
+import { STORE } from '../../../config'
+import { addOrder } from '../../api/order_api';
+import PopupDialog from '../../components/PopupDialog';
+import success from '../../assets/images/success-cart.png'
+import { useDispatch } from "react-redux";
+import { show } from '../../states/alerts';
 
-function ShowProduct({ product, action, signUp }) {
+
+function ShowProduct({ product, action, signUp, user }) {
 
     const [quantity, setQuantity] = useState(1);
+    const [onCart, setCart] = useState(false);
+    const [onCheckout, setCheckout] = useState(false);
+    const [showDialog, setDialog] = useState(false);
+
+    const dispatch = useDispatch();
+
+    const handleCart = async () => {
+        setCart(true);
+
+        var cleanUser = {
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            imageUrl: user.imageUrl
+        }
+
+        const order = {
+            storeID: STORE.storeID,
+            customerID: user._id,
+            productID: product._id,
+            customer: cleanUser,
+            product: product,
+            quantity: quantity,
+            orderDate: new Date(),
+            orderStatus: 0,
+            orderAmount: product.price * quantity
+        }
+
+        addOrder(order)
+            .then((res) => {
+                setCart(false);
+                if (res.status != 200) {
+                    dispatch(show({
+                        type: 'error',
+                        message: 'Something went wrong.',
+                        duration: 2000,
+                        show: true
+                    }))
+                    return;
+                }
+
+                dispatch(show({
+                    type: 'success',
+                    message: 'Item added to your cart.',
+                    duration: 2000,
+                    show: true
+                }));
+            }).catch((err) => {
+                setCart(false);
+                dispatch(show({
+                    type: 'error',
+                    message: 'Something went wrong.',
+                    duration: 2000,
+                    show: true
+                }))
+                console.log(err)
+            })
+    }
+
+    const handleCheckout = () => {
+        setDialog(true)
+    }
 
     return (
         <div className='w-[800px] h-[500px] bg-[#f5f7f8] rounded-lg'>
@@ -44,13 +114,21 @@ function ShowProduct({ product, action, signUp }) {
                         </div>
                         <div className='py-3 flex flex-row justify-between gap-4 font-lato-bold text-sm'>
                             <button
+                                disabled={onCart}
                                 onClick={() => {
-                                    signUp(true)
+                                    if (!user._id) return signUp(true);
+
+                                    handleCart();
                                 }}
-                                className='w-full text-[#ffc100]  h-10 border border-[#ffc100] rounded-lg shadow-sm'>Add to Cart</button>
-                            <button className='w-full h-10 shadow-sm rounded-lg bg-[#ffc100]'>Checkout</button>
+                                className={`${onCart && 'opacity-60'} border-[#ffc100] w-full text-[#ffc100] h-10 border rounded-lg shadow-sm flex items-center justify-center`}>
+                                {onCart ? <CircularProgress size={'24px'} color='inherit' className='text-[#ffc100]' /> : 'Add to Cart'}
+                            </button>
+                            <button
+                                onClick={() => { handleCheckout() }}
+                                className='w-full h-10 shadow-sm rounded-lg bg-[#ffc100]'>Checkout</button>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
