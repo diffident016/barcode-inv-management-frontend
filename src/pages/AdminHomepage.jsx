@@ -104,7 +104,14 @@ function AdminHomepage() {
             header: '',
             count: orders['count']
         },
-        { label: 'Sales', component: <Sales />, icon: <ArrowTrendingUpIcon />, header: '' },
+        {
+            label: 'Sales',
+            component: <Sales
+                sales={sales}
+            />,
+            icon: <ArrowTrendingUpIcon />,
+            header: ''
+        },
     ]
 
     const fetchOrders = () => {

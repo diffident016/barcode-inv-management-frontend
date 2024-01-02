@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
     LineChart,
     Line,
@@ -10,125 +10,129 @@ import {
     Label,
     ResponsiveContainer
 } from 'recharts';
+import salesforecast from '../../assets/data/salesforecast.json'
+import makePrediction from '../../components/SimpleSalesForecast';
+import { format } from 'date-fns';
+import {
+    forecastIcon,
+    growthIcon
+} from '../../assets/images'
 
+function SalesForecast({ sales }) {
 
-function SalesForecast() {
+    const [forecastData, setForecast] = useState([]);
+    const [selected, setSelected] = useState(0);
 
-    const data = [
-        {
-            name: 'Jan',
-            uv: 4000,
-            pv: 2400,
-            amt: 2400,
-        },
-        {
-            name: 'Feb',
-            uv: 3000,
-            pv: 1398,
-            amt: 2210,
-        },
-        {
-            name: 'Mar',
-            uv: 2000,
-            pv: 9800,
-            amt: 2290,
-        },
-        {
-            name: 'Apr',
-            uv: 2780,
-            pv: 3908,
-            amt: 2000,
-        },
-        {
-            name: 'May',
-            uv: 1890,
-            pv: 4800,
-            amt: 2181,
-        },
-        {
-            name: 'Jun',
-            uv: 2390,
-            pv: 3800,
-            amt: 2500,
-        },
-        {
-            name: 'Jul',
-            uv: 3490,
-            pv: 4300,
-            amt: 2100,
-        },
-        {
-            name: 'Aug',
-            uv: 3790,
-            pv: 4500,
-            amt: 2100,
-        },
-        {
-            name: 'Sep',
-            uv: 3490,
-            pv: 4300,
-            amt: 2100,
-        },
-        {
-            name: 'Oct',
-            uv: 3090,
-            pv: 4600,
-            amt: 2100,
-        },
-        {
-            name: 'Nov',
-            uv: 3190,
-            pv: 4100,
-            amt: 2100,
-        },
-        {
-            name: 'Dec',
-            uv: 3590,
-            pv: 4600,
-            amt: 2100,
-        },
-    ];
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-    const CustomTooltip = ({ active, payload, label }) => {
-        if (active && payload && payload.length) {
-            return (
-                <div className="w-full h-16 bg-white/60 border rounded-lg">
-                    <p className="label">{`Actual Sales : ${payload[0].value}`}</p>
-                    <p className="label">{`Forcasted Sales : ${payload[1].value}`}</p>
-                </div>
-            );
-        }
+    const getPrediction = () => {
+        const predictions = makePrediction(
+            salesforecast["forecast_input"],
+            salesforecast["months_to_predict"],
+            salesforecast["sales_cycle"]);
 
-        return null;
-    };
+        const group = sales['sales'].reduce((group, sale) => {
+            const { dateRecord } = sale;
+            group[format(dateRecord, 'MMM')] = group[format(dateRecord, 'MMM')] ?? [];
+            group[format(dateRecord, 'MMM')].push(sale);
+            return group;
+        }, {});
+
+        var newData = [];
+        months.map((key, index) => {
+
+            let sales = 0;
+
+            if (!group[key]) {
+                return newData.push({
+                    name: key,
+                    Forecasted: Math.round(predictions['predictions'][index]),
+                })
+            }
+
+            group[key].map((item) => {
+                sales = sales + item.totalSales
+            })
+
+            newData.push({
+                name: key,
+                Actual: sales,
+                Forecasted: Math.round(predictions['predictions'][index])
+            })
+        })
+
+        setSelected({
+            label: newData[0].name,
+            actual: newData[0]['Actual'] || 'No data yet.',
+            forecast: newData[0]['Forecasted'] || 'No data yet.'
+        })
+        setForecast(newData);
+
+    }
+
+    useEffect(() => {
+        getPrediction();
+    }, [sales])
 
     return (
-        <div className='flex flex-col flex-1 h-full bg-white border rounded-lg p-4'>
-            <h1 className='font-lato-bold text-sm'>Sales Forecast</h1>
-            <ResponsiveContainer width="100%" height="100%" className='text-sm py-2' >
-                <LineChart
-                    width={450}
-                    height={250}
-                    data={data}
-                    margin={{
-                        top: 5,
-                        right: 10,
-                        left: 15,
-                        bottom: 15,
-                    }}
-                >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" >
-                        <Label value="Months of the Year" offset={0} position="bottom" />
-                    </XAxis>
-                    <YAxis>
-                        <Label value="Sales" angle={-90} offset={0} position="left" />
-                    </YAxis>
-                    <Tooltip content={<CustomTooltip />} />
-                    <Line type="monotone" dataKey="pv" stroke="#ffc100" activeDot={{ r: 5 }} />
-                    <Line type="monotone" dataKey="uv" stroke="#8400ff" />
-                </LineChart>
-            </ResponsiveContainer>
+        <div className='flex flex-row w-full h-full gap-2'>
+            <div className='flex flex-col flex-1 h-full bg-white border rounded-lg p-4'>
+                <h1 className='font-lato-bold text-sm'>Sales Forecast</h1>
+                <ResponsiveContainer width="100%" height="100%" className='text-sm py-2' >
+                    <LineChart
+                        width={450}
+                        height={250}
+                        data={forecastData}
+                        onClick={(e) => {
+                            const payload = e.activePayload[0]['payload'];
+                            setSelected({
+                                label: e.activeLabel,
+                                actual: payload['Actual'] || 'No data yet.',
+                                forecast: payload['Forecast'] || 'No data yet.'
+                            })
+                        }}
+                        margin={{
+                            top: 5,
+                            right: 10,
+                            left: 15,
+                            bottom: 15,
+                        }}
+                    >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <Tooltip />
+                        <XAxis dataKey="name" >
+                            <Label value="Months of the Year" offset={0} position="bottom" />
+                        </XAxis>
+                        <YAxis>
+                            <Label value="Sales" angle={-90} offset={0} position="left" />
+                        </YAxis>
+                        <Line type="monotone" dataKey="Actual" stroke="#ffc100" activeDot={{ r: 5 }} />
+                        <Line type="monotone" dataKey="Forecasted" stroke="#8400ff" />
+                    </LineChart>
+                </ResponsiveContainer>
+            </div>
+            <div className='flex flex-col w-[300px] h-full bg-white border rounded-lg p-4'>
+                <h1 className='font-lato-bold text-sm'>Actual Sales ({selected['label']})</h1>
+                <div className='flex w-full flex-row py-6 px-2'>
+                    <div className='w-12 h-12 bg-[#fff2cc] p-2 rounded-lg'>
+                        <img src={growthIcon} className='w-8 h-8' />
+                    </div>
+                    <div className='flex flex-col px-4'>
+                        <p className='font-lato-bold opacity-70 text-sm'>Sales</p>
+                        <p className='font-lato-bold'>{selected['actual']}</p>
+                    </div>
+                </div>
+                <h1 className='font-lato-bold text-sm pt-2'>Forcasted Sales ({selected['label']})</h1>
+                <div className='flex w-full flex-row py-6 px-2'>
+                    <div className='w-12 h-12 bg-[#8400ff]/10 p-2 rounded-lg'>
+                        <img src={forecastIcon} className='w-8 h-8' />
+                    </div>
+                    <div className='flex flex-col px-4'>
+                        <p className='font-lato-bold opacity-70 text-sm'>Sales</p>
+                        <p className='font-lato-bold'>{selected['forecast']}</p>
+                    </div>
+                </div>
+            </div>
         </div>
     )
 }
