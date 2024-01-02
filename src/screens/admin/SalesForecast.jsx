@@ -88,7 +88,7 @@ function SalesForecast({ sales }) {
                             setSelected({
                                 label: e.activeLabel,
                                 actual: payload['Actual'] || 'No data yet.',
-                                forecast: payload['Forecast'] || 'No data yet.'
+                                forecast: payload['Forecasted'] || 'No data yet.'
                             })
                         }}
                         margin={{
