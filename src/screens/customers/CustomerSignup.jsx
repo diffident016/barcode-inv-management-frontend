@@ -7,6 +7,7 @@ import { loginCustomer, registerCustomer } from '../../api/customer_api';
 import { useDispatch } from "react-redux";
 import { show } from '../../states/alerts';
 import { customerLogin } from '../../states/customer'
+import { useNavigate } from 'react-router-dom';
 
 function CustomerSignup({ close }) {
 
@@ -17,6 +18,7 @@ function CustomerSignup({ close }) {
     const [isLoading, setLoading] = useState(false);
 
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const [form, updateForm] = useReducer((prev, next) => {
         return { ...prev, ...next }
@@ -99,15 +101,7 @@ function CustomerSignup({ close }) {
                 }
 
                 dispatch(customerLogin(user));
-                handleReset();
-                close();
-                dispatch(show({
-                    type: 'success',
-                    message: 'Account login successful.',
-                    duration: 3000,
-                    show: true
-                }))
-
+                navigate(0);
             })
             .catch((err) => {
                 setLoading(false)

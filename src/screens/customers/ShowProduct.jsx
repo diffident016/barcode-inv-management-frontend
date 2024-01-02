@@ -1,5 +1,5 @@
 import { MinusCircleIcon, MinusIcon, PlusCircleIcon, PlusIcon, ShoppingBagIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import { CircularProgress } from '@mui/material';
+import { Backdrop, CircularProgress } from '@mui/material';
 import React, { useState } from 'react'
 import { STORE } from '../../../config'
 import { addOrder } from '../../api/order_api';
@@ -7,13 +7,14 @@ import PopupDialog from '../../components/PopupDialog';
 import success from '../../assets/images/success-cart.png'
 import { useDispatch } from "react-redux";
 import { show } from '../../states/alerts';
+import Checkout from './Checkout';
 
 
-function ShowProduct({ product, action, signUp, user }) {
+function ShowProduct({ product, action, signUp, user, refresh }) {
 
     const [quantity, setQuantity] = useState(1);
     const [onCart, setCart] = useState(false);
-    const [onCheckout, setCheckout] = useState(false);
+    const [checkoutItem, setCheckoutItem] = useState(null);
     const [showDialog, setDialog] = useState(false);
 
     const dispatch = useDispatch();
@@ -53,6 +54,7 @@ function ShowProduct({ product, action, signUp, user }) {
                     return;
                 }
 
+                refresh();
                 dispatch(show({
                     type: 'success',
                     message: 'Item added to your cart.',
@@ -72,7 +74,27 @@ function ShowProduct({ product, action, signUp, user }) {
     }
 
     const handleCheckout = () => {
-        setDialog(true)
+
+        var cleanUser = {
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            imageUrl: user.imageUrl
+        }
+
+        const order = {
+            storeID: STORE.storeID,
+            customerID: user._id,
+            productID: product._id,
+            customer: cleanUser,
+            product: product,
+            quantity: quantity,
+            orderDate: new Date(),
+            orderStatus: 1,
+            orderAmount: product.price * quantity
+        }
+
+        setCheckoutItem(order)
     }
 
     return (
@@ -102,13 +124,13 @@ function ShowProduct({ product, action, signUp, user }) {
                                 <div className='my-1 items-center flex flex-row max-w-min py-1 px-2 border rounded-[15px] shadow-sm'>
                                     <MinusIcon onClick={() => { if (quantity > 1) { setQuantity(quantity - 1) } }} className={`w-4 cursor-pointer text-[#1F2F3D]`} />
                                     <p className='w-8 bg-white text-center  font-lato-bold'>{quantity}</p>
-                                    <PlusIcon onClick={() => { if (quantity < product.available) { setQuantity(quantity + 1) } }} className={`w-4 cursor-pointer text-[#1F2F3D]`} />
+                                    <PlusIcon onClick={() => { if (quantity < product.stock - product.sold) { setQuantity(quantity + 1) } }} className={`w-4 cursor-pointer text-[#1F2F3D]`} />
                                 </div>
                             </div>
                             <div className='flex flex-col'>
                                 <p className='pt-3 font-lato-bold text-xs opacity-90'>STOCK</p>
                                 <div className='my-1 items-center flex flex-row max-w-min py-1 px-2 border rounded-[15px] shadow-sm'>
-                                    <p className='w-8 bg-white text-center font-lato-bold' >{product.available}</p>
+                                    <p className='w-8 bg-white text-center font-lato-bold' >{product.stock - product.sold}</p>
                                 </div>
                             </div>
                         </div>
@@ -124,11 +146,19 @@ function ShowProduct({ product, action, signUp, user }) {
                                 {onCart ? <CircularProgress size={'24px'} color='inherit' className='text-[#ffc100]' /> : 'Add to Cart'}
                             </button>
                             <button
-                                onClick={() => { handleCheckout() }}
+                                onClick={() => {
+                                    if (!user._id) return signUp(true);
+                                    handleCheckout();
+                                }}
                                 className='w-full h-10 shadow-sm rounded-lg bg-[#ffc100]'>Checkout</button>
                         </div>
                     </div>
-
+                    <Backdrop
+                        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                        open={!!checkoutItem}
+                    >
+                        {!!checkoutItem && <Checkout checkout={checkoutItem} refresh={() => { refresh() }} close={() => { setCheckoutItem(null) }} />}
+                    </Backdrop>
                 </div>
             </div>
         </div>

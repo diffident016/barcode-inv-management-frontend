@@ -1,13 +1,37 @@
-import { Dialog } from '@mui/material'
+import {
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle
+} from '@mui/material'
 import React from 'react'
 
-function PopupDialog({ open, close, children }) {
+function PopupDialog({ show, close, title, content, action1, action2 }) {
     return (
         <Dialog
-            open={open}
+            open={show}
             onClose={close}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+            className='font-lato'
         >
-            {children}
+            <DialogTitle id="alert-dialog-title" fontSize={18}>
+                {title}
+            </DialogTitle>
+            <DialogContent>
+                <p>{content}</p>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={() => {
+                    action1();
+                }} autoFocus>
+                    Yes
+                </Button>
+                <Button onClick={() => {
+                    action2();
+                }}>No</Button>
+            </DialogActions>
         </Dialog>
     )
 }

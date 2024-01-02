@@ -1,19 +1,23 @@
 import React, { useState, useReducer, useRef, useMemo } from 'react'
 import { PlusIcon, XMarkIcon, PhotoIcon, PencilSquareIcon } from '@heroicons/react/24/outline'
-import category from '../assets/data/category.json'
-import { addProduct } from '../api/product_api';
+import category from '../../assets/data/category.json'
+import { addProduct } from '../../api/product_api';
 import { useSelector } from "react-redux";
-import { CLOUDINARY_URL } from '../../config';
+import { CLOUDINARY_URL } from '../../../config';
 import { useDispatch } from "react-redux";
-import { show } from '../states/alerts';
+import { show } from '../../states/alerts';
+import PopupDialog from '../../components/PopupDialog';
+import { CircularProgress } from '@mui/material';
 
-function AddProduct({ close }) {
+function AddProduct({ close, refresh, barcode }) {
 
     const hiddenFileInput = useRef(null);
     const [fileError, setFileError] = useState("");
     const [fileImage, setFileImage] = useState(null);
     const user = useSelector((state) => state.user.value);
     const dispatch = useDispatch();
+    const [showDialog, setShowDialog] = useState(false);
+    const [isAdding, setAdding] = useState(false);
 
     const [product, updateProduct] = useReducer((prev, next) => {
         return { ...prev, ...next }
@@ -29,7 +33,7 @@ function AddProduct({ close }) {
             category: "",
             barcode: "",
             vendor: "",
-            available: "",
+            sold: "",
         });
 
     const categories = useMemo(() => category['categories'].map((cat) => {
@@ -53,7 +57,10 @@ function AddProduct({ close }) {
                             placeholder='0'
                             min={0}
                             type='number'
-                            onChange={(e) => { updateProduct({ [field]: parseFloat(e.target.value) }) }}
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                updateProduct({ [field]: !!value ? parseFloat(value) : null })
+                            }}
                             className='w-full h-8 focus:outline-none bg-transparent text-end' />
                     </div>
 
@@ -82,6 +89,42 @@ function AddProduct({ close }) {
         });
     };
 
+    const handleAddProduct = async () => {
+
+        setAdding(true);
+        const photoUrl = await uploadImage(fileImage)
+            .then((res) => res.json())
+            .then((data) => data.url)
+            .catch((error) => console.log(error));
+
+        var newProduct = product;
+        newProduct['photoUrl'] = photoUrl;
+
+        addProduct(newProduct).then((res) => res.json())
+            .then((val) => {
+                setAdding(false);
+                handleReset();
+                refresh();
+
+                dispatch(show({
+                    type: 'success',
+                    message: 'Product added successfully.',
+                    duration: 3000,
+                    show: true
+                }))
+            })
+            .catch((err) => {
+                console.log(err);
+                setAdding(false);
+                dispatch(show({
+                    type: 'error',
+                    message: 'Failed to add the product.',
+                    duration: 3000,
+                    show: true
+                }))
+            });
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault()
 
@@ -92,28 +135,16 @@ function AddProduct({ close }) {
 
         setFileError(null)
 
-        await uploadImage(fileImage)
-            .then((res) => res.json())
-            .then((data) => {
-                console.log(data.url)
-                updateProduct({
-                    userID: user._id,
-                    category: JSON.parse(e.target[2].value),
-                    barcode: String(Date.now()).slice(3, 13),
-                    photoUrl: data.url
-                })
-            }
-            )
-            .catch((error) => console.log(error));
+        updateProduct({
+            userID: user._id,
+            category: JSON.parse(e.target[2].value),
+            barcode: barcode || String(Date.now()).slice(3, 13),
+        })
 
-        console.log(product)
-        addProduct(product)
-
-
+        setShowDialog(true);
     }
 
-    const handleReset = (event) => {
-        event.preventDefault();
+    const handleReset = () => {
         Object.keys(product).forEach((inputKey) => {
             updateProduct({ [inputKey]: ['price', 'cost', 'stock'].includes(inputKey) ? 0 : '' });
         });
@@ -164,20 +195,18 @@ function AddProduct({ close }) {
     }
 
     return (
-        <div className='w-[500px] h-[520px] bg-white rounded-lg text-[#555C68]'>
+        <div className='relative w-[500px] h-[520px] bg-white rounded-lg text-[#555C68]'>
+            {isAdding &&
+                <div className='flex items-center justify-center absolute w-full h-full bg-white/60'>
+                    <CircularProgress color='inherit' className='text-[#ffc100]' />
+                </div>
+            }
             <div className='flex flex-col w-full h-full p-4'>
                 <div className='flex flex-row h-1 my-4 items-center justify-between px-2'>
                     <h1 className='flex gap-2 items-center font-lato-bold'><span><PlusIcon className='w-5' /></span>Add new Product</h1>
                     <XMarkIcon onClick={() => {
-                        dispatch(show({
-                            type: 'success',
-                            message: 'Product has been added to the inventory.',
-                            duration: 3000,
-                            show: true
-                        }))
-
-                        // handleReset()
-                        // close()
+                        handleReset()
+                        close()
                     }} className='w-5 cursor-pointer' />
                 </div>
                 <form onSubmit={handleSubmit} onReset={handleReset} className='flex flex-col p-4 w-full h-full'>
@@ -197,7 +226,6 @@ function AddProduct({ close }) {
                                 <label className='pb-1 text-xs font-lato-bold text-[#555C68]/80'>Category</label>
                                 <div className='w-full h-8 rounded-md focus:outline-none border border-[#555C68]/50 px-1'>
                                     <select
-                                        defaultValue={JSON.stringify(categories[0].value)}
                                         required
                                         className='w-full h-full focus:outline-none bg-transparent text-sm '>
                                         {categories.map((item, i) => <option id={item.id} value={JSON.stringify(item.value)}>{item.label}</option>)}
@@ -220,10 +248,9 @@ function AddProduct({ close }) {
                                 min={0}
                                 value={product.stock}
                                 onChange={(e) => {
-                                    const stock = parseFloat(e.target.value);
+                                    const value = e.target.value;
                                     updateProduct({
-                                        stock: stock,
-                                        available: stock
+                                        stock: !!value ? parseFloat(value) : 0
                                     })
                                 }}
                                 className='w-full h-8 rounded-md focus:outline-none border border-[#555C68]/50 text-sm px-2' />
@@ -238,10 +265,23 @@ function AddProduct({ close }) {
                         className='text-sm p-2 border-[#555C68]/50 border rounded-md resize-none focus:outline-none' />
                     <div className='flex flex-row w-full gap-5 px-2 my-5 justify-end'>
                         {fileError && <p className='flex-1 text-sm text-[#ff3333]'>{fileError}</p>}
-                        <button type='submit' className='bg-[#555C68] rounded-md p-2 text-sm text-white'>Add Product</button>
+                        <button type='submit' className='bg-[#ffc100] rounded-md p-2 px-4 text-sm font-lato-bold'>Add Product</button>
                         <button type='reset' className='font-lato-bold text-sm text-[#555C68]'>Cancel</button>
                     </div>
                 </form>
+                <PopupDialog
+                    show={showDialog}
+                    close={() => { setShowDialog(false) }}
+                    title='Add Product'
+                    content='Are you sure you want to add this product?'
+                    action1={() => {
+                        handleAddProduct();
+                        setShowDialog(false);
+                    }}
+                    action2={() => {
+                        setShowDialog(false)
+                    }}
+                />
             </div>
         </div>
     )

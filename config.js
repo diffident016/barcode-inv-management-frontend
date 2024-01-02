@@ -1,5 +1,5 @@
-export const BASEURL = 'http://localhost:4000'
-export const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/dvtex4guw'
+export const BASEURL = import.meta.env.BASEURL || 'http://localhost:4000'
+export const CLOUDINARY_URL = import.meta.env.VITE_CLOUDINARY_URL
 
 const colors = {
     primary: '#ffc100',

@@ -38,14 +38,11 @@ function AdminLogin() {
         try {
             await signin(email, password);
 
-            setTimeout(await getUserData(currentUser.uid).then((user) => {
-                console.log(user)
-                dispatch(login(user))
-                navigate('/admin');
-            }), 2000)
+            const user = await getUserData(currentUser.uid)
+            dispatch(login(user))
+            navigate('/admin');
 
         } catch (e) {
-            console.log(e);
             setError('Invalid email or password.')
             setOnLogin(false)
         }

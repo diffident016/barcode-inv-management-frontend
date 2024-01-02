@@ -1,6 +1,4 @@
 import { BASEURL } from '../../config'
-import products from '../assets/data/products.json'
-import categories from '../assets/data/category.json'
 
 const addProduct = (product) => {
     return fetch(`${BASEURL}/api/product/add`, {
@@ -13,27 +11,28 @@ const addProduct = (product) => {
     });
 }
 
-const getAllProducts = (userId) => {
-    return fetch(`${BASEURL}/api/product/get/${userId}`);
+const productUpdate = (product) => {
+    return fetch(`${BASEURL}/api/product/update`, {
+        method: "POST",
+        headers: {
+            "Content-type": "application/json",
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify(product),
+    });
 }
 
-const loadProducts = async () => {
-    products['products'].map(async (data) => {
+const getAllProducts = (storeID) => {
+    return fetch(`${BASEURL}/api/product/get/${storeID}`);
+}
 
-        var data = data;
-
-        data['userID'] = '657175eea67f86460299f511'
-        data['barcode'] = String(Date.now()).slice(3, 13);
-        data['available'] = data.stock
-
-        await addProduct(data).then((val) => {
-            console.log(val);
-        }).catch((err) => console.log(err))
-    })
+const deleteProduct = (productID) => {
+    return fetch(`${BASEURL}/api/product/delete/${productID}`);
 }
 
 export {
     addProduct,
     getAllProducts,
-    loadProducts
+    productUpdate,
+    deleteProduct
 }

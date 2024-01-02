@@ -23,8 +23,12 @@ export function AuthProvider({ children }) {
         return createUserWithEmailAndPassword(auth, email, password)
     }
 
-    function signin(email, password) {
-        return signInWithEmailAndPassword(auth, email, password)
+    async function signin(email, password) {
+        return new Promise((resolve, reject) => {
+            signInWithEmailAndPassword(auth, email, password).then((val) => {
+                resolve(val);
+            }).catch((err) => reject(err))
+        });
     }
 
     function signout() {

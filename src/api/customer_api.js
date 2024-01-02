@@ -22,4 +22,8 @@ const loginCustomer = (credentials) => {
     });
 }
 
-export { registerCustomer, loginCustomer }
+const getAllCustomers = () => {
+    return fetch(`${BASEURL}/api/customer/get/all`);
+}
+
+export { registerCustomer, loginCustomer, getAllCustomers }

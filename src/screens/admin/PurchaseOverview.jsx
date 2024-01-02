@@ -5,9 +5,9 @@ import {
     pendingIcon,
     completedIcon,
     customerIcon
-} from '../assets/images'
+} from '../../assets/images'
 
-function PurchaseOverview() {
+function PurchaseOverview({ stats }) {
     return (
         <div className='flex-1 h-full bg-white rounded-lg border p-4'>
             <h1 className='font-lato-bold text-sm'>Store Overview</h1>
@@ -19,16 +19,16 @@ function PurchaseOverview() {
                         </div>
                         <div className='flex flex-col px-4'>
                             <p className='font-lato-bold text-xs'>No. of Products</p>
-                            <p className='font-lato-bold'>200</p>
+                            <p className='font-lato-bold'>{stats.products}</p>
                         </div>
                     </div>
                     <div className='flex flex-1 flex-row'>
-                        <div className='w-10 h-10 p-2 bg-[#ff007b]/10 rounded-lg'>
+                        <div className='w-10 h-10 p-2 bg-[#8400ff]/10 rounded-lg'>
                             <img src={pendingIcon} className='w-6 h-6' />
                         </div>
                         <div className='flex flex-col px-4'>
                             <p className='font-lato-bold text-xs'>Pending Orders</p>
-                            <p className='font-lato-bold'>20</p>
+                            <p className='font-lato-bold'>{stats.pending}</p>
                         </div>
                     </div>
                 </div>
@@ -39,7 +39,7 @@ function PurchaseOverview() {
                         </div>
                         <div className='flex flex-col px-4'>
                             <p className='font-lato-bold text-xs'>No. of Customers</p>
-                            <p className='font-lato-bold'>4</p>
+                            <p className='font-lato-bold'>{stats.customers}</p>
                         </div>
                     </div>
                     <div className='flex flex-1 flex-row'>
@@ -48,7 +48,7 @@ function PurchaseOverview() {
                         </div>
                         <div className='flex flex-col px-4'>
                             <p className='font-lato-bold text-xs'>Completed Orders</p>
-                            <p className='font-lato-bold'>40</p>
+                            <p className='font-lato-bold'>{stats.completed}</p>
                         </div>
                     </div>
                 </div>

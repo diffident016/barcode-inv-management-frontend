@@ -4,9 +4,9 @@ import {
     costIcon,
     revenueIcon,
     profitIcon,
-} from '../assets/images'
+} from '../../assets/images'
 
-function SalesOverview() {
+function SalesOverview({ stats }) {
     return (
         <div className='flex flex-col w-full flex-1 h-full bg-white rounded-lg border p-4'>
             <h1 className='font-lato-bold text-sm'>Sales Overview</h1>
@@ -18,7 +18,10 @@ function SalesOverview() {
                         </div>
                         <div className='flex flex-col px-4'>
                             <p className='font-lato-bold text-xs'>Total Sales</p>
-                            <p className='font-lato-bold'>200</p>
+                            <p className='font-lato-bold'>{stats.sales.toLocaleString('en-US', {
+                                style: 'currency',
+                                currency: 'PHP',
+                            })}</p>
                         </div>
                     </div>
                     <div className='flex flex-1 flex-row'>
@@ -27,7 +30,10 @@ function SalesOverview() {
                         </div>
                         <div className='flex flex-col px-4'>
                             <p className='font-lato-bold text-xs'>Revenue</p>
-                            <p className='font-lato-bold'>P100</p>
+                            <p className='font-lato-bold'>{stats.revenue.toLocaleString('en-US', {
+                                style: 'currency',
+                                currency: 'PHP',
+                            })}</p>
                         </div>
                     </div>
                 </div>
@@ -38,7 +44,10 @@ function SalesOverview() {
                         </div>
                         <div className='flex flex-col px-4'>
                             <p className='font-lato-bold text-xs'>Cost</p>
-                            <p className='font-lato-bold'>P200</p>
+                            <p className='font-lato-bold'>{stats.cost.toLocaleString('en-US', {
+                                style: 'currency',
+                                currency: 'PHP',
+                            })}</p>
                         </div>
                     </div>
                     <div className='flex flex-1 flex-row'>
@@ -46,8 +55,11 @@ function SalesOverview() {
                             <img src={profitIcon} className='w-6 h-6' />
                         </div>
                         <div className='flex flex-col px-4'>
-                            <p className='font-lato-bold text-xs'>Profit</p>
-                            <p className='font-lato-bold'>P100</p>
+                            <p className='font-lato-bold text-xs'>Stocks</p>
+                            <p className='font-lato-bold'>{stats.stocks.toLocaleString('en-US', {
+                                style: 'currency',
+                                currency: 'PHP',
+                            })}</p>
                         </div>
                     </div>
                 </div>

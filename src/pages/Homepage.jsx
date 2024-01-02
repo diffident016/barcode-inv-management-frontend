@@ -12,7 +12,9 @@ import { hide } from '../states/alerts';
 import Navbar from './Navbar'
 import { STORE } from '../../config'
 import { getAllProducts } from '../api/product_api'
-import { getCart } from '../api/order_api'
+import { getCart, getOrder } from '../api/order_api'
+import socketIO from "socket.io-client"
+import { BASEURL } from '../../config';
 
 function Homepage() {
 
@@ -28,6 +30,7 @@ function Homepage() {
         {
             fetchState: 0,
             products: [],
+            groupProducts: [],
             count: 0
         });
 
@@ -40,7 +43,7 @@ function Homepage() {
             count: 0
         });
 
-    const [order, setOrdes] = useReducer((prev, next) => {
+    const [order, setOrder] = useReducer((prev, next) => {
         return { ...prev, ...next }
     },
         {
@@ -48,6 +51,26 @@ function Homepage() {
             orders: [],
             count: 0
         });
+
+
+    const fetchOrder = () => {
+        setOrder({ fetchState: 0 })
+        getOrder(customer._id).then((response) => response.json())
+            .then((data) => {
+                if (!data) return null;
+
+                setOrder({
+                    fetchState: data.length < 1 ? 2 : 1,
+                    orders: data,
+                    count: data.length
+                })
+
+            })
+            .catch((err) => {
+                console.log(err)
+                setOrder({ fetchState: -1 })
+            });
+    }
 
     const fetchCart = () => {
         setCart({ fetchState: 0 })
@@ -74,17 +97,19 @@ function Homepage() {
             .then((data) => {
                 if (!data) return null;
 
-                const products = data.map((item) => {
-                    var newItem = item;
+                const group = data.reduce((group, product) => {
+                    const { category } = product;
 
-                    newItem['selected'] = false
-                    return newItem
-                });
+                    group[category['category_id']] = group[category['category_id']] ?? [];
+                    group[category['category_id']].push(product);
+                    return group;
+                }, {});
 
                 setProducts({
                     fetchState: products.length < 1 ? 2 : 1,
-                    products: products,
-                    count: products.length
+                    products: data,
+                    count: products.length,
+                    groupProducts: group
                 })
 
             })
@@ -94,26 +119,66 @@ function Homepage() {
             });
     }
 
+    const changeScreen = (index) => {
+
+        if (index > 0) {
+            if (!customer._id) {
+                setSignUp(true)
+                return;
+            }
+        }
+        setScreen(index)
+    }
+
     useEffect(() => {
         fetchProduct();
+
+        if (!customer._id) {
+            return;
+        }
+
         fetchCart();
+        fetchOrder();
+
     }, [])
 
 
     const screens = [
         {
             label: 'Products',
-            component: <Products user={customer} signUp={setSignUp} products={products} />,
+            component: <Products
+                user={customer}
+                signUp={setSignUp}
+                products={products}
+                refresh={() => {
+                    fetchCart();
+                    fetchOrder();
+                }}
+            />,
             icon: <ShoppingBagIcon />,
             header: 'Welcome, customer!'
         },
         {
             label: 'Shopping Cart',
-            component: <ShoppingCart carts={cart} refresh={() => { fetchCart() }} />,
+            component: <ShoppingCart
+                carts={cart}
+                refresh={() => {
+                    fetchCart();
+                    fetchOrder();
+                }} />,
             icon: <ShoppingCartIcon />,
-            header: 'Shopping Cart'
+            header: 'Shopping Cart',
+            count: cart['count']
         },
-        { label: 'Orders', component: <Orders />, icon: <CubeIcon />, header: 'Ordered Items' }
+        {
+            label: 'Orders',
+            component: <Orders
+                orders={order}
+                refresh={() => { fetchOrder() }} />,
+            icon: <CubeIcon />,
+            header: 'Ordered Items',
+            count: order['count']
+        }
     ]
 
     return (
@@ -123,7 +188,7 @@ function Homepage() {
                     <div className='flex justify-center h-20 w-full py-2'>
                         <h1 className='cursor-pointer text-center font-cinzel font-extrabold text-xl text-[#1F2F3D]'>{STORE.storeName}</h1>
                     </div>
-                    <Sidebar screens={screens} screen={screen} setScreen={setScreen} />
+                    <Sidebar screens={screens} screen={screen} setScreen={(index) => { changeScreen(index) }} />
                 </div>
                 <div className='flex flex-col w-full h-full'>
                     <Navbar screen={screens[screen]} user={customer} signin={() => { setSignUp(true) }} />

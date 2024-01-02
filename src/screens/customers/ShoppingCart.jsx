@@ -1,16 +1,18 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import error from '../../assets/images/error.svg'
 import empty from '../../assets/images/empty-cart.svg'
-import { CircularProgress } from '@mui/material';
+import { Backdrop, CircularProgress } from '@mui/material';
 import { MinusIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { removeOrder, updateQuantity } from '../../api/order_api';
 import { useDispatch } from "react-redux";
 import { show } from '../../states/alerts';
+import Checkout from './Checkout';
 
 function ShoppingCart({ carts, refresh }) {
 
     const [query, setQuery] = useState('');
     const [quantity, setQuantity] = useState(null)
+    const [onCheckout, setCheckout] = useState(null)
 
     const dispatch = useDispatch();
 
@@ -21,7 +23,8 @@ function ShoppingCart({ carts, refresh }) {
         carts['products'].map((item) => {
             temp.push({
                 quantity: item.quantity,
-                available: item.product.available,
+                available: item.product.stock - item.product.sold,
+                orderAmount: item.orderAmount,
                 onUpdate: false
             });
         })
@@ -86,7 +89,8 @@ function ShoppingCart({ carts, refresh }) {
                                                     }
 
                                                     newArr[index]['quantity'] = val.quantity;
-                                                    newArr[index]['available'] = val.product.available;
+                                                    newArr[index]['orderAmount'] = val.orderAmount;
+                                                    newArr[index]['available'] = val.product.stock - val.product.sold;
 
                                                     setQuantity(newArr)
                                                 }).catch((err) => {
@@ -119,7 +123,8 @@ function ShoppingCart({ carts, refresh }) {
                                                 }
 
                                                 newArr[index]['quantity'] = val.quantity;
-                                                newArr[index]['available'] = val.product.available;
+                                                newArr[index]['orderAmount'] = val.orderAmount;
+                                                newArr[index]['available'] = val.product.stock - val.product.sold;
 
                                                 setQuantity(newArr)
                                             }).catch((err) => {
@@ -136,7 +141,7 @@ function ShoppingCart({ carts, refresh }) {
             },
             {
                 name: "Total Amount",
-                cell: (row) => <p className='w-full text-base overflow-hidden font-lato-bold text-ellipsis'>{row.orderAmount.toLocaleString('en-US', {
+                cell: (row, index) => <p className='w-full text-base overflow-hidden font-lato-bold text-ellipsis'>{quantity[index].orderAmount.toLocaleString('en-US', {
                     style: 'currency',
                     currency: 'PHP',
                 })}</p>,
@@ -144,14 +149,26 @@ function ShoppingCart({ carts, refresh }) {
             },
             {
                 name: "Actions",
-                cell: (row) =>
+                cell: (row, index) =>
                     <div className='flex flex-row gap-2'>
-                        <button className='w-24 py-[6px] rounded-lg text-sm font-lato-bold border text-[#ffc100] border-[#ffc100]'>Checkout</button>
+                        <button
+                            onClick={() => {
+
+                                const newItem = {
+                                    orderID: row._id,
+                                    productID: row.product._id,
+                                    product: row.product,
+                                    quantity: quantity[index]['quantity'],
+                                    orderAmount: quantity[index]['orderAmount']
+                                }
+
+                                setCheckout(newItem)
+                            }}
+                            className='w-24 py-[6px] rounded-lg text-sm font-lato-bold bg-[#ffc100]'>Checkout</button>
                         <button
                             onClick={() => {
                                 removeOrder(row._id).then((res) => res.json())
                                     .then((val) => {
-
                                         dispatch(show({
                                             type: 'success',
                                             message: 'Item has been removed.',
@@ -253,6 +270,12 @@ function ShoppingCart({ carts, refresh }) {
                         }</div>
                     </div>
             }
+            <Backdrop
+                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={!!onCheckout}
+            >
+                {!!onCheckout && <Checkout checkout={onCheckout} refresh={() => { refresh() }} close={() => { setCheckout(null) }} />}
+            </Backdrop>
         </div>
     )
 }
