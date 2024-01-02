@@ -26,38 +26,25 @@ function Dashboard({ sales, products, orders, customers }) {
 
     const computeSales = () => {
 
-        var data = [];
-        var sales = 0;
-        var cost = 0;
+        var tempSales = 0;
+        var tempCost = 0;
         var stocks = 0;
 
-        products['products'].map((item) => {
-            data.push(
-                {
-                    productID: item._id,
-                    name: item.name,
-                    price: item.price,
-                    item_cost: item.cost,
-                    sold: item.sold,
-                    sales: item.price * item.sold,
-                    cost: item.cost * item.sold,
-                    stock: item.price * (item.stock - item.sold)
-                }
-            )
-        })
+        sales['sales'].map((item) => {
+            tempSales = tempSales + item.totalSales
+            tempCost = tempCost + item.totalCost
+        });
 
-        data.map((item) => {
-            sales += item.sales
-            cost += item.cost
-            stocks += item.stock
+        products['products'].map((item) => {
+            stocks = stocks + ((item.stock - item.sold) * item.price)
         })
 
         setStats({
-            products: data.length,
-            sales: sales,
-            cost: cost,
+            products: products['count'],
+            sales: tempSales,
+            cost: tempCost,
             stocks: stocks,
-            revenue: sales - cost
+            revenue: tempSales - tempCost
         })
     }
 
@@ -79,7 +66,7 @@ function Dashboard({ sales, products, orders, customers }) {
         getCustomers();
         computeSales();
         getOrders();
-    }, [])
+    }, [sales, products, orders, customers])
 
     return (
         <div className='flex flex-col h-full overflow-auto p-4 gap-2 text-[#555C68]'>

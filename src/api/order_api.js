@@ -71,6 +71,10 @@ const completeOrder = (order) => {
     });
 }
 
+const getAllSales = (storeID) => {
+    return fetch(`${BASEURL}/api/sales/get/all/${storeID}`);
+}
+
 export {
     addOrder,
     getCart,
@@ -80,5 +84,6 @@ export {
     getOrder,
     cancelOrder,
     getAllOrder,
-    completeOrder
+    completeOrder,
+    getAllSales
 }

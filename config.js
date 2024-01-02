@@ -1,4 +1,4 @@
-export const BASEURL = import.meta.env.BASEURL || 'http://localhost:4000'
+export const BASEURL = import.meta.env.VITE_BASEURL || 'http://localhost:4000'
 export const CLOUDINARY_URL = import.meta.env.VITE_CLOUDINARY_URL
 
 const colors = {

@@ -16,7 +16,7 @@ import AdminSidebar from './AdminSidebar';
 import AdminNavbar from './AdminNavbar';
 import { getAllProducts } from '../api/product_api';
 import { STORE } from '../../config';
-import { getAllOrder } from '../api/order_api';
+import { getAllOrder, getAllSales } from '../api/order_api';
 import { getAllCustomers } from '../api/customer_api';
 import { socket } from '../api/socket';
 
@@ -74,6 +74,7 @@ function AdminHomepage() {
                 orders={orders}
                 products={products}
                 customers={customers}
+                sales={sales}
             />,
             icon: <Squares2X2Icon />,
             header: ''
@@ -172,13 +173,13 @@ function AdminHomepage() {
 
     const fetchSales = () => {
         setSales({ fetchState: 0 })
-        getAllCustomers().then((response) => response.json())
+        getAllSales(STORE.storeID).then((response) => response.json())
             .then((data) => {
                 if (!data) return null;
 
                 setSales({
                     fetchState: data.length < 1 ? 2 : 1,
-                    customers: data,
+                    sales: data,
                     count: data.length
                 })
 
@@ -212,6 +213,7 @@ function AdminHomepage() {
             fetchProducts();
             fetchOrders();
             fetchCustomers();
+            fetchSales();
         }
 
         socket.on('update', onUpdate);
@@ -225,6 +227,7 @@ function AdminHomepage() {
         fetchProducts();
         fetchOrders();
         fetchCustomers();
+        fetchSales();
     }, []);
 
 
