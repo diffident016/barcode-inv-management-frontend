@@ -27,7 +27,7 @@ function ScanBarcode({
   };
 
   return (
-    <div className="w-[400px] h-[520px] bg-white rounded-lg mx-2">
+    <div className="w-[360px] h-[520px] bg-white rounded-lg ">
       <div className="w-full h-full flex flex-col text-[#555C68] font-lato">
         <div className="flex flex-row h-1 my-4 items-center justify-between px-4 py-2">
           <h1 className="flex gap-2 items-center text-sm font-lato-bold">
@@ -45,7 +45,7 @@ function ScanBarcode({
         </div>
         <div className="w-[400px] h-[400px]">
           <BarcodeScannerComponent
-            width={400}
+            width={360}
             height={400}
             stopStream={stream}
             onUpdate={handleScan}
@@ -68,7 +68,7 @@ function ScanBarcode({
                   <span className="font-lato-bold">{scannedProduct.name}</span>
                 </p>
               </div>
-              <div className="flex items-center justify-center w-full pt-8">
+              <div className="flex items-center justify-center w-full pt-8 z-10">
                 <button
                   onClick={() => {
                     close();
