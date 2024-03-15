@@ -22,6 +22,7 @@ import { getAllCustomers } from "../api/customer_api";
 import { socket } from "../api/socket";
 import AccountManager from "../screens/admin/AccountManager";
 import { getAllUsers } from "../api/user_api";
+import CompletedOrders from "../screens/admin/CompletedOrders";
 
 function AdminHomepage() {
   const [screen, setScreen] = useState(0);
@@ -117,14 +118,7 @@ function AdminHomepage() {
     },
     {
       label: "Purchase",
-      component: (
-        <Purchase
-          orders={orders}
-          refresh={() => {
-            fetchOrders();
-          }}
-        />
-      ),
+      component: <CompletedOrders orders={orders} refresh={() => {}} />,
       icon: <ShoppingCartIcon />,
       header: "",
       count: orders["count"],

@@ -4,16 +4,14 @@ import {
   ArrowRightOnRectangleIcon,
 } from "@heroicons/react/24/outline";
 import { ListItemIcon, Menu, MenuItem, MenuList } from "@mui/material";
-import { useDispatch } from "react-redux";
-import { logout } from "../states/customer";
-import { useNavigate } from "react-router-dom";
 import { STORE } from "../../config";
+import { useAuth } from "../auth/AuthContext";
 
 function Navbar({ user, screen, signin }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [open, setOpen] = useState(false);
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+
+  const { signout } = useAuth();
 
   const handleClick = (event) => {
     setOpen(true);
@@ -70,8 +68,7 @@ function Navbar({ user, screen, signin }) {
           <MenuItem
             onClick={() => {
               setOpen(false);
-              dispatch(logout());
-              navigate(0);
+              signout();
             }}
           >
             <ListItemIcon>
