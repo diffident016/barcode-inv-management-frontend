@@ -236,6 +236,8 @@ function Dashboard({ signUp, user, products, refresh, categories }) {
                       onClick={() => {
                         let isAdded = false;
 
+                        if (item.stock - item.sold < 1) return null;
+
                         if (orders) {
                           isAdded = orders.filter((order) => {
                             return order["item"]["_id"] == item["_id"];
@@ -266,7 +268,9 @@ function Dashboard({ signUp, user, products, refresh, categories }) {
 
                         setOrders(temp);
                       }}
-                      className="cursor-pointer hover:ring-1 ring-[#ffc100] flex flex-col bg-white items-center h-[250px] w-full border rounded-lg shadow-sm p-4"
+                      className={`${
+                        item.stock - item.sold < 1 && "opacity-50"
+                      } cursor-pointer hover:ring-1 ring-[#ffc100] flex flex-col bg-white items-center h-[250px] w-full border rounded-lg shadow-sm p-4`}
                     >
                       <div className="w-full h-28 flex justify-center">
                         <img

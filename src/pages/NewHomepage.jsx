@@ -1,6 +1,6 @@
 import React, { useEffect, useReducer, useState } from "react";
 import { STORE } from "../../config";
-import logo from "../assets/images/icon.png";
+import logo from "../assets/images/logo.png";
 import { Search } from "@mui/icons-material";
 import { getAllProducts } from "../api/product_api";
 import { Backdrop, CircularProgress } from "@mui/material";
@@ -109,7 +109,7 @@ function NewHomepage() {
   return (
     <div className="w-full h-screen">
       <div className="h-full w-full flex flex-col items-center justify-center gap-4 font-lato overflow-hidden">
-        <img src={logo} className="w-24 h-24" />
+        <img src={logo} className="w-36 h-36" />
         <h1 className="cursor-pointer text-center font-cinzel font-extrabold text-xl text-[#1F2F3D]">
           {STORE.storeName}
         </h1>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import banner from "../assets/images/Barcode-bro.png";
+import banner from "../assets/images/logo.png";
 import { CircularProgress } from "@mui/material";
 import { useAuth } from "../auth/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -70,8 +70,11 @@ function AdminLogin() {
   return (
     <div className="w-full h-screen">
       <div className="flex flex-row h-full w-full">
-        <div className="flex-1 flex items-center justify-center">
-          <img className="w-[350px]" alt="banner" src={banner} />
+        <div className="flex-1 flex flex-col items-center justify-center gap-4">
+          <img className="w-[250px]" alt="banner" src={banner} />
+          <h1 className="font-lato-bold text-2xl">
+            PSAU CONSUMERS COOPERATIVE
+          </h1>
         </div>
         <div className="flex-1 flex items-center justify-center h-full w-full ">
           {forgot ? (

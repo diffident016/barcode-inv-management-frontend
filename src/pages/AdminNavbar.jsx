@@ -1,11 +1,12 @@
 import React from "react";
-import logo from "../assets/images/icon.png";
+import logo from "../assets/images/logo.png";
 import {
   Cog6ToothIcon,
   ArrowRightOnRectangleIcon,
 } from "@heroicons/react/24/outline";
 import { ListItemIcon, Menu, MenuItem, MenuList } from "@mui/material";
 import { useAuth } from "../auth/AuthContext";
+import { STORE } from "../../config";
 
 function AdminNavbar({ user }) {
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -20,9 +21,9 @@ function AdminNavbar({ user }) {
   return (
     <div className="w-full h-16 bg-white shadow-sm">
       <div className="flex flex-row w-full py-5 px-7">
-        <div className="flex flex-row items-center gap-4 ">
+        <div className="flex flex-row items-center gap-4 w-full ">
           <img src={logo} className="w-8" />
-          <h1 className="font-lato-black text-[#0b2b29] ">INVENTORY</h1>
+          <h1 className="font-lato-black text-[#0b2b29] ">{STORE.storeName}</h1>
         </div>
         <div className="flex w-full flex-row justify-between">
           <div></div>
