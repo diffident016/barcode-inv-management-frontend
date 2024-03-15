@@ -11,7 +11,7 @@ function PrivateRoute({ children }) {
   const { pathname } = useLocation();
   const user = useSelector((state) => state.user.value);
 
-  if (!currentUser && !user.userType) {
+  if (!currentUser || !user.userType) {
     if (pathname !== "/admin" && pathname !== "/clerk") return children;
 
     return <Navigate to="/login" replace />;

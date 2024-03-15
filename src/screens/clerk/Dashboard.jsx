@@ -1,6 +1,4 @@
 import React, { useState, useMemo, useEffect } from "react";
-import category from "../../assets/data/category.json";
-import { getAllProducts } from "../../api/product_api";
 import barcode from "../../assets/images/barcode.png";
 import { Backdrop, CircularProgress } from "@mui/material";
 import empty from "../../assets/images/no-products.svg";
@@ -13,7 +11,7 @@ import { checkoutOrder } from "../../api/order_api";
 import { useDispatch } from "react-redux";
 import { show } from "../../states/alerts";
 
-function Dashboard({ signUp, user, products, refresh }) {
+function Dashboard({ signUp, user, products, refresh, categories }) {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState(0);
   const [showProduct, setShowProduct] = useState(null);
@@ -34,28 +32,31 @@ function Dashboard({ signUp, user, products, refresh }) {
     setTotal(tempS);
   }, [orders]);
 
-  const categories = useMemo(() => {
-    var cat = [
+  const cat = useMemo(() => {
+    var temp = [
       {
         label: "Filter by categories",
         value: 0,
       },
     ];
 
-    cat = cat.concat(
-      category["categories"].map((cat) => {
+    if (categories.fetchState != 1) return temp;
+
+    temp = temp.concat(
+      categories["categories"].map((c) => {
         return {
-          label: cat["category_name"],
-          value: cat,
+          label: c["category_name"],
+          value: c,
         };
       })
     );
 
-    return cat;
-  }, [category]);
+    return temp;
+  }, [categories]);
 
   const handleProducts = () => {
-    if (filter != 0) return products["groupProducts"][filter.category_id] || [];
+    if (filter != 0)
+      return products["groupProducts"][filter.category_name] || [];
 
     return products["products"];
   };
@@ -178,7 +179,7 @@ function Dashboard({ signUp, user, products, refresh }) {
                     }}
                     className="w-full h-full focus:outline-none bg-transparent text-sm "
                   >
-                    {categories.map((item, i) => (
+                    {cat.map((item, i) => (
                       <option
                         selected={item.value == 0 && filter == 0}
                         id={item.id}

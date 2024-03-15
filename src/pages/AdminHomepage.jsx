@@ -6,6 +6,7 @@ import {
   ShoppingCartIcon,
   ArrowTrendingUpIcon,
   UsersIcon,
+  TagIcon,
 } from "@heroicons/react/24/outline";
 import Inventory from "../screens/admin/Inventory";
 import Purchase from "../screens/admin/Purchase";
@@ -23,6 +24,8 @@ import { socket } from "../api/socket";
 import AccountManager from "../screens/admin/AccountManager";
 import { getAllUsers } from "../api/user_api";
 import CompletedOrders from "../screens/admin/CompletedOrders";
+import Categories from "../screens/admin/Categories";
+import { getAllCategories } from "../api/category_api";
 
 function AdminHomepage() {
   const [screen, setScreen] = useState(0);
@@ -88,6 +91,17 @@ function AdminHomepage() {
     }
   );
 
+  const [categories, setCategories] = useReducer(
+    (prev, next) => {
+      return { ...prev, ...next };
+    },
+    {
+      fetchState: 0,
+      categories: [],
+      count: 0,
+    }
+  );
+
   const screens = [
     {
       label: "Dashboard",
@@ -133,6 +147,19 @@ function AdminHomepage() {
       label: "Accounts",
       component: <AccountManager users={users} />,
       icon: <UsersIcon />,
+      header: "",
+    },
+    {
+      label: "Categories",
+      component: (
+        <Categories
+          categories={categories}
+          refresh={() => {
+            fetchCategories();
+          }}
+        />
+      ),
+      icon: <TagIcon />,
       header: "",
     },
   ];
@@ -240,6 +267,32 @@ function AdminHomepage() {
       });
   };
 
+  const fetchCategories = () => {
+    setCategories({ fetchState: 0 });
+    getAllCategories()
+      .then((response) => response.json())
+      .then((data) => {
+        if (!data) return null;
+
+        setCategories({
+          fetchState: data.length < 1 ? 2 : 1,
+          categories: data.map((item, index) => {
+            return {
+              _id: item["_id"],
+              no: index + 1,
+              category_name: item["category_name"],
+              category_id: item["category_id"],
+            };
+          }),
+          count: data.length,
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        setCategories({ fetchState: -1 });
+      });
+  };
+
   useEffect(() => {
     socket.connect();
 
@@ -266,6 +319,7 @@ function AdminHomepage() {
       fetchCustomers();
       fetchSales();
       fetchUsers();
+      fetchCategories();
     };
 
     socket.on("update", onUpdate);
@@ -281,6 +335,7 @@ function AdminHomepage() {
     fetchCustomers();
     fetchSales();
     fetchUsers();
+    fetchCategories();
   }, []);
 
   return (

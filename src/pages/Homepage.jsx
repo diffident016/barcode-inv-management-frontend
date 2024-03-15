@@ -21,6 +21,7 @@ import { getCart, getOrder } from "../api/order_api";
 import socketIO from "socket.io-client";
 import { BASEURL } from "../../config";
 import Dashboard from "../screens/clerk/Dashboard";
+import { getAllCategories } from "../api/category_api";
 
 function Homepage() {
   const [screen, setScreen] = useState(0);
@@ -63,6 +64,44 @@ function Homepage() {
       count: 0,
     }
   );
+
+  const [categories, setCategories] = useReducer(
+    (prev, next) => {
+      return { ...prev, ...next };
+    },
+    {
+      fetchState: 0,
+      categories: [],
+      count: 0,
+    }
+  );
+
+  const fetchCategories = () => {
+    setCategories({ fetchState: 0 });
+    getAllCategories()
+      .then((response) => response.json())
+      .then((data) => {
+        if (!data) return null;
+
+        console.log(data);
+        setCategories({
+          fetchState: data.length < 1 ? 2 : 1,
+          categories: data.map((item, index) => {
+            return {
+              _id: item["_id"],
+              no: index + 1,
+              category_name: item["category_name"],
+              category_id: item["category_id"],
+            };
+          }),
+          count: data.length,
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+        setCategories({ fetchState: -1 });
+      });
+  };
 
   const fetchOrder = () => {
     setOrder({ fetchState: 0 });
@@ -112,8 +151,9 @@ function Homepage() {
         const group = data.reduce((group, product) => {
           const { category } = product;
 
-          group[category["category_id"]] = group[category["category_id"]] ?? [];
-          group[category["category_id"]].push(product);
+          group[category["category_name"]] =
+            group[category["category_name"]] ?? [];
+          group[category["category_name"]].push(product);
           return group;
         }, {});
 
@@ -142,6 +182,7 @@ function Homepage() {
 
   useEffect(() => {
     fetchProduct();
+    fetchCategories();
 
     if (!customer._id) {
       return;
@@ -215,6 +256,7 @@ function Homepage() {
             refresh={() => {
               fetchProduct();
             }}
+            categories={categories}
           />
         </div>
         <Backdrop
