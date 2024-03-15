@@ -7,6 +7,7 @@ import { ListItemIcon, Menu, MenuItem, MenuList } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { logout } from "../states/customer";
 import { useNavigate } from "react-router-dom";
+import { STORE } from "../../config";
 
 function Navbar({ user, screen, signin }) {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -22,7 +23,9 @@ function Navbar({ user, screen, signin }) {
   return (
     <div className="w-full bg-white border rounded-lg shadow-sm">
       <div className="w-full lg:h-16 h-12 flex flex-row items-center lg:px-4 px-2 justify-between">
-        <h1 className="lg:text-base text-sm font-lato-bold">{screen.header}</h1>
+        <h1 className="hidden lg:flex cursor-pointer text-center font-cinzel font-extrabold text-xl text-[#1F2F3D]">
+          {STORE.storeName}
+        </h1>
         {!user._id ? (
           <div className="flex flex-row">
             <button

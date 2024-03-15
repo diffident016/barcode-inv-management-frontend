@@ -20,6 +20,7 @@ import { getAllProducts } from "../api/product_api";
 import { getCart, getOrder } from "../api/order_api";
 import socketIO from "socket.io-client";
 import { BASEURL } from "../../config";
+import Dashboard from "../screens/clerk/Dashboard";
 
 function Homepage() {
   const [screen, setScreen] = useState(0);
@@ -27,6 +28,7 @@ function Homepage() {
   const dispatch = useDispatch();
   const alert = useSelector((state) => state.alert.value);
   const customer = useSelector((state) => state.customer.value);
+  const user = useSelector((state) => state.user.value);
 
   const [products, setProducts] = useReducer(
     (prev, next) => {
@@ -200,29 +202,20 @@ function Homepage() {
   return (
     <div className="w-full h-screen">
       <div className="flex flex-row h-full w-full lg:p-4 p-2 lg:gap-4 gap-2 overflow-hidden font-lato text-[#555C68]">
-        <div className="lg:w-[20%] w-[12%] h-full bg-white shadow-sm border rounded-lg lg:p-4 p-2">
-          <div className="flex justify-center h-20 w-full py-2">
-            <h1 className="hidden lg:flex cursor-pointer text-center font-cinzel font-extrabold text-xl text-[#1F2F3D]">
-              {STORE.storeName}
-            </h1>
-          </div>
-          <Sidebar
-            screens={screens}
-            screen={screen}
-            setScreen={(index) => {
-              changeScreen(index);
-            }}
-          />
-        </div>
-        <div className="flex flex-col lg:w-full w-[86%] h-full">
+        <div className="flex flex-col lg:w-full h-full">
           <Navbar
             screen={screens[screen]}
-            user={customer}
+            user={user}
             signin={() => {
               setSignUp(true);
             }}
           />
-          {screens[screen].component}
+          <Dashboard
+            products={products}
+            refresh={() => {
+              fetchProduct();
+            }}
+          />
         </div>
         <Backdrop
           sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}

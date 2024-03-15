@@ -69,6 +69,14 @@ function App() {
                 </PrivateRoute>
               }
             />
+            <Route
+              path="/clerk"
+              element={
+                <PrivateRoute>
+                  <Homepage />
+                </PrivateRoute>
+              }
+            />
             <Route path="/login" element={<AdminLogin />} />
           </Routes>
         </AuthProvider>
