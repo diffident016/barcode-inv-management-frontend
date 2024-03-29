@@ -125,6 +125,7 @@ function AdminHomepage() {
           refresh={() => {
             fetchProducts();
           }}
+          categories={categories}
         />
       ),
       icon: <CubeIcon />,
