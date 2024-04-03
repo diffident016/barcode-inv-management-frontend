@@ -9,6 +9,8 @@ import {
   Legend,
   Label,
   ResponsiveContainer,
+  BarChart,
+  Bar,
 } from "recharts";
 import salesforecast from "../../assets/data/salesforecast.json";
 import makePrediction from "../../components/SimpleSalesForecast";
@@ -18,6 +20,7 @@ import { forecastIcon, growthIcon } from "../../assets/images";
 function SalesForecast({ sales }) {
   const [forecastData, setForecast] = useState([]);
   const [selected, setSelected] = useState(2);
+  const [monthly, setMonthly] = useState([]);
 
   const months = [
     "Jan",
@@ -80,19 +83,68 @@ function SalesForecast({ sales }) {
     setForecast(newData);
   };
 
+  const computeMonthlySales = () => {
+    var newData = [];
+
+    const group = sales["sales"].reduce((group, sale) => {
+      const { dateRecord } = sale;
+      group[format(dateRecord, "MMM/yyyy")] =
+        group[format(dateRecord, "MMM/yyyy")] ?? [];
+      group[format(dateRecord, "MMM/yyyy")].push(sale);
+      return group;
+    }, {});
+
+    Object.keys(group).forEach((key) => {
+      let sales = 0;
+      let cost = 0;
+      let revenue = 0;
+
+      group[key].map((item) => {
+        sales = sales + item.totalSales;
+        cost = cost + item.totalCost;
+        revenue = revenue + item.totalRevenue;
+      });
+
+      newData.push({
+        name: key,
+        Sales: sales,
+        Cost: cost,
+        Revenue: revenue,
+      });
+    });
+
+    setMonthly(newData);
+  };
+
   useEffect(() => {
     getPrediction();
+    computeMonthlySales();
   }, [sales]);
 
   return (
     <div className="flex flex-row w-full h-full gap-2">
-      <div className="flex flex-col flex-1 h-full bg-white border rounded-lg p-4">
-        <h1 className="font-lato-bold text-sm">Sales Forecast</h1>
-        <ResponsiveContainer
-          width="100%"
-          height="100%"
-          className="text-sm py-2"
-        >
+      <div className="flex flex-col flex-1 h-full bg-white border rounded-lg p-4 gap-2">
+        <div className="flex flex-row w-full items-center justify-between ">
+          <h1 className="font-lato-bold">Sales Forecast</h1>
+          <div className="flex flex-row items-center gap-4">
+            <div className="flex flex-row items-center gap-2">
+              <label className="w-4 h-1 bg-[#ffc100]" />
+              <h1 className="font-lato-bold text-sm">
+                Actual({selected["label"]}):
+              </h1>
+              <p className="font-lato-bold text-sm">{selected["actual"]}</p>
+            </div>
+            <div className="flex flex-row items-center gap-2">
+              <label className="w-4 h-1 bg-[#8400ff]" />
+              <h1 className="font-lato-bold text-sm">
+                Forcasted({selected["label"]}):
+              </h1>
+              <p className="font-lato-bold text-sm">{selected["forecast"]}</p>
+            </div>
+          </div>
+        </div>
+
+        <ResponsiveContainer width="100%" height="90%" className="text-sm py-2">
           <LineChart
             width={450}
             height={250}
@@ -130,31 +182,30 @@ function SalesForecast({ sales }) {
           </LineChart>
         </ResponsiveContainer>
       </div>
-      <div className="flex flex-col w-[300px] h-full bg-white border rounded-lg p-4">
-        <h1 className="font-lato-bold text-sm">
-          Actual Sales ({selected["label"]})
-        </h1>
-        <div className="flex w-full flex-row py-6 px-2">
-          <div className="w-12 h-12 bg-[#fff2cc] p-2 rounded-lg">
-            <img src={growthIcon} className="w-8 h-8" />
-          </div>
-          <div className="flex flex-col px-4">
-            <p className="font-lato-bold opacity-70 text-sm">Sales</p>
-            <p className="font-lato-bold">{selected["actual"]}</p>
-          </div>
-        </div>
-        <h1 className="font-lato-bold text-sm pt-2">
-          Forcasted Sales ({selected["label"]})
-        </h1>
-        <div className="flex w-full flex-row py-6 px-2">
-          <div className="w-12 h-12 bg-[#8400ff]/10 p-2 rounded-lg">
-            <img src={forecastIcon} className="w-8 h-8" />
-          </div>
-          <div className="flex flex-col px-4">
-            <p className="font-lato-bold opacity-70 text-sm">Sales</p>
-            <p className="font-lato-bold">{selected["forecast"]}</p>
-          </div>
-        </div>
+      <div className="flex flex-col p-4 w-1/2 h-full bg-white border shadow-sm rounded-lg gap-2">
+        <h1 className="font-lato-bold">Monthly Sales</h1>
+        <ResponsiveContainer className="text-sm py-2" width="100%" height="90%">
+          <BarChart
+            width={350}
+            height={250}
+            data={monthly}
+            margin={{
+              top: 20,
+              right: 30,
+              left: 20,
+              bottom: 5,
+            }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="Sales" fill="#ffc100" />
+            <Bar dataKey="Cost" fill="#ff007b" />
+            <Bar dataKey="Revenue" fill="#8400ff" />
+          </BarChart>
+        </ResponsiveContainer>
       </div>
     </div>
   );

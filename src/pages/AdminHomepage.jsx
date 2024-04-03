@@ -138,12 +138,12 @@ function AdminHomepage() {
       header: "",
       count: orders["count"],
     },
-    {
-      label: "Sales",
-      component: <Sales sales={sales} />,
-      icon: <ArrowTrendingUpIcon />,
-      header: "",
-    },
+    // {
+    //   label: "Sales",
+    //   component: <Sales sales={sales} />,
+    //   icon: <ArrowTrendingUpIcon />,
+    //   header: "",
+    // },
     {
       label: "Accounts",
       component: <AccountManager users={users} />,
