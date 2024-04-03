@@ -299,6 +299,7 @@ function Inventory({ user, products, refresh, categories }) {
             {addProduct.add && (
               <AddProduct
                 barcode={addProduct.barcode}
+                products={products}
                 close={() => {
                   setAddProduct({
                     add: false,

@@ -21,6 +21,7 @@
     "@reduxjs/toolkit": "^2.0.1",
     "date-fns": "^3.0.6",
     "firebase": "^10.7.1",
+    "html5-qrcode": "^2.3.8",
     "ml-regression-simple-linear": "^3.0.0",
     "react": "^18.2.0",
     "react-barcode": "^1.4.6",

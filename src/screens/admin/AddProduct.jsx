@@ -4,6 +4,7 @@ import {
   XMarkIcon,
   PhotoIcon,
   PencilSquareIcon,
+  ArrowPathIcon,
 } from "@heroicons/react/24/outline";
 import { addProduct } from "../../api/product_api";
 import { useSelector } from "react-redux";
@@ -12,15 +13,20 @@ import { useDispatch } from "react-redux";
 import { show } from "../../states/alerts";
 import PopupDialog from "../../components/PopupDialog";
 import { CircularProgress } from "@mui/material";
+import Barcode from "react-barcode";
+import barcodeIcon from "../../assets/images/barcode.png";
+import Backdrop from "@mui/material/Backdrop";
+import BarcodeScanner from "../../components/BarcodeScanner";
 
-function AddProduct({ close, refresh, barcode, categories }) {
+function AddProduct({ close, refresh, barcode, categories, products }) {
   const hiddenFileInput = useRef(null);
-  const [fileError, setFileError] = useState("");
+  const [error, setError] = useState("");
   const [fileImage, setFileImage] = useState(null);
   const user = useSelector((state) => state.user.value);
   const dispatch = useDispatch();
   const [showDialog, setShowDialog] = useState(false);
   const [isAdding, setAdding] = useState(false);
+  const [scan, setScan] = useState(false);
 
   const [product, updateProduct] = useReducer(
     (prev, next) => {
@@ -35,8 +41,7 @@ function AddProduct({ close, refresh, barcode, categories }) {
       stock: "",
       cost: "",
       category: "",
-      barcode: "",
-      vendor: "",
+      barcode: barcode || "",
       sold: "",
     }
   );
@@ -149,16 +154,15 @@ function AddProduct({ close, refresh, barcode, categories }) {
     e.preventDefault();
 
     if (fileImage == null) {
-      setFileError("Please add a product image.");
+      setError("Please add a product image.");
       return;
     }
 
-    setFileError(null);
+    setError(null);
 
     updateProduct({
       userID: user._id,
       category: JSON.parse(e.target[2].value),
-      barcode: barcode || String(Date.now()).slice(3, 13),
     });
 
     setShowDialog(true);
@@ -185,10 +189,10 @@ function AddProduct({ close, refresh, barcode, categories }) {
     const fileUploaded = event.target.files[0];
 
     if (!allowedTypes.includes(fileUploaded.type)) {
-      setFileError("Invalid image file.");
+      setError("Invalid image file.");
       return;
     }
-    setFileError(null);
+    setError(null);
     setFileImage(fileUploaded);
   };
 
@@ -225,7 +229,7 @@ function AddProduct({ close, refresh, barcode, categories }) {
   };
 
   return (
-    <div className="relative w-[500px] h-[520px] bg-white rounded-lg text-[#555C68]">
+    <div className="relative w-[500px] h-[540px] bg-white rounded-lg text-[#555C68]">
       {isAdding && (
         <div className="flex items-center justify-center absolute w-full h-full bg-white/60">
           <CircularProgress color="inherit" className="text-[#ffc100]" />
@@ -290,10 +294,7 @@ function AddProduct({ close, refresh, barcode, categories }) {
           <div className="flex flex-row gap-2 mt-2">
             {Field("Price", product.price, "price", true)}
             {Field("Cost", product.cost, "cost", true)}
-          </div>
-          <div className="flex flex-row gap-2 mt-2">
-            {Field("Manufacturer", product.vendor, "vendor")}
-            <div className="w-28 flex flex-col">
+            <div className="w-42 flex flex-col">
               <label className="pb-1 text-xs font-lato-bold text-[#555C68]/80">
                 Stock
               </label>
@@ -312,6 +313,7 @@ function AddProduct({ close, refresh, barcode, categories }) {
               />
             </div>
           </div>
+
           <label className="mt-2 p-1 text-xs font-lato-bold text-[#555C68]/80">
             Description
           </label>
@@ -321,13 +323,52 @@ function AddProduct({ close, refresh, barcode, categories }) {
               updateProduct({ description: e.target.value });
             }}
             placeholder="Add product description"
-            rows={4}
+            rows={2}
             className="text-sm p-2 border-[#555C68]/50 border rounded-md resize-none focus:outline-none"
           />
-          <div className="flex flex-row w-full gap-5 px-2 my-5 justify-end">
-            {fileError && (
-              <p className="flex-1 text-sm text-[#ff3333]">{fileError}</p>
-            )}
+          <div className="h-[100px] w-full flex flex-row mt-4 gap-2">
+            <div className="flex flex-col flex-1 justify-between">
+              {Field("Product Barcode", product.barcode, "barcode")}
+              <div className="flex flex-row w-full items-center gap-2">
+                <div
+                  onClick={() => {
+                    const genBarcode = String(Date.now()).slice(3, 13);
+
+                    updateProduct({ barcode: genBarcode });
+                  }}
+                  className="flex gap-2 h-8 items-center cursor-pointer border border-[#555C68]/40 py-1 flex-1 justify-center rounded-lg shadow-sm"
+                >
+                  <ArrowPathIcon className="w-4" />
+                  <h1 className="font-lato-bold text-xs">Generate</h1>
+                </div>
+                <div
+                  onClick={() => {
+                    setScan(true);
+                  }}
+                  className="flex gap-2 cursor-pointer items-center border h-8 border-[#555C68]/40 py-1 flex-1 justify-center rounded-lg shadow-sm"
+                >
+                  <img src={barcodeIcon} className="w-4 h-4" />
+                  <h1 className="font-lato-bold text-xs">Scan Code</h1>
+                </div>
+              </div>
+            </div>
+            <div className="flex-1 h-[100px] w-[200px] border border-[#555C68]/50 rounded-lg flex items-center justify-center">
+              {product.barcode ? (
+                <Barcode
+                  margin={0}
+                  height={40}
+                  width={1.6}
+                  background="transparent"
+                  fontSize={12}
+                  value={product.barcode}
+                />
+              ) : (
+                <p className="text-sm font-lato-bold">No barcode</p>
+              )}
+            </div>
+          </div>
+          <div className="flex flex-row w-full gap-5 px-2 justify-end mt-5">
+            {error && <p className="flex-1 text-sm text-[#ff3333]">{error}</p>}
             <button
               type="submit"
               className="bg-[#ffc100] rounded-md p-2 px-4 text-sm font-lato-bold"
@@ -357,6 +398,36 @@ function AddProduct({ close, refresh, barcode, categories }) {
             setShowDialog(false);
           }}
         />
+        <Backdrop
+          sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          open={scan}
+        >
+          {scan && (
+            <BarcodeScanner
+              close={() => {
+                setScan(false);
+              }}
+              stream={scan}
+              output={(val) => {
+                updateProduct({ barcode: "" });
+                setError("");
+
+                const product = products["products"].find(
+                  (product) => product.barcode === val
+                );
+
+                if (!product) {
+                  updateProduct({ barcode: val });
+                } else {
+                  setError(
+                    "The scanned product barcode was already in the inventory."
+                  );
+                }
+                setScan(false);
+              }}
+            />
+          )}
+        </Backdrop>
       </div>
     </div>
   );
