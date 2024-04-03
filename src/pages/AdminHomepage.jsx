@@ -198,9 +198,17 @@ function AdminHomepage() {
       .then((data) => {
         if (!data) return null;
 
+        const group = data.reduce((group, product) => {
+          const { category } = product;
+
+          group[category["category_id"]] = group[category["category_id"]] ?? [];
+          group[category["category_id"]].push(product);
+          return group;
+        }, {});
+
         setProducts({
           fetchState: data.length < 1 ? 2 : 1,
-          productGroup: [],
+          productGroup: group,
           products: data,
           count: data.length,
         });
