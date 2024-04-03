@@ -15,15 +15,14 @@ function Sidebar({ screens, setScreen, screen }) {
               screen == index ? "text-[#ffc100]" : "text-[#555C68]"
             } items-center gap-4 cursor-pointer`}
           >
-            <Badge badgeContent={item.count} color="warning">
-              <div
-                className={`lg:w-[32px] w-[24px] lg:h-[32px] h-[24px] lg:p-1 rounded-full ${
-                  screen == index && "bg-[#fff2cc]"
-                }`}
-              >
-                {item.icon}
-              </div>
-            </Badge>
+            <div
+              className={`lg:w-[32px] w-[24px] lg:h-[32px] h-[24px] lg:p-1 rounded-full ${
+                screen == index && "bg-[#fff2cc]"
+              }`}
+            >
+              {item.icon}
+            </div>
+
             <p className={`font-lato-bold text-base lg:flex hidden`}>
               {item.label}
             </p>

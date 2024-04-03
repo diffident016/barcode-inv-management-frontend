@@ -343,7 +343,7 @@ function CompletedOrders({ orders, refresh }) {
     <div className="w-full h-full p-4">
       <div className="w-full h-full flex flex-col text-[#555C68] gap-2     ">
         <div className="w-full bg-white border rounded-lg px-4 py-4">
-          <h1 className="font-lato-bold text-base">Completed Orders</h1>
+          <h1 className="font-lato-bold text-base">Transactions</h1>
           <div className="flex flex-row justify-between w-full items-center pt-3">
             <div className="flex flex-row items-center">
               <input

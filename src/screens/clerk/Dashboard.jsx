@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useReducer } from "react";
 import barcode from "../../assets/images/barcode.png";
 import { Backdrop, CircularProgress } from "@mui/material";
 import empty from "../../assets/images/no-products.svg";
@@ -23,14 +23,44 @@ function Dashboard({ signUp, user, products, refresh, categories }) {
 
   const dispatch = useDispatch();
 
+  const [order, updateOrder] = useReducer(
+    (prev, next) => {
+      return { ...prev, ...next };
+    },
+    {
+      orders: [],
+      totalItems: 0,
+      totalAmount: 0,
+      bill: 0,
+      change: 0,
+    }
+  );
+
+  const tableItems = [
+    {
+      width: 50,
+      label: "Qty.",
+    },
+    {
+      width: null,
+      label: "Name",
+    },
+    {
+      width: 60,
+      label: "Amount",
+    },
+  ];
+
   useEffect(() => {
     let tempS = 0;
-    orders.map((item) => {
+    var tempQ = 0;
+    order["orders"].map((item) => {
       tempS += item["item"]["price"] * item["quantity"];
+      tempQ += item["quantity"];
     });
 
-    setTotal(tempS);
-  }, [orders]);
+    updateOrder({ totalAmount: tempS, totalItems: tempQ });
+  }, [order]);
 
   const cat = useMemo(() => {
     var temp = [
@@ -103,7 +133,7 @@ function Dashboard({ signUp, user, products, refresh, categories }) {
 
   const proceedOrder = async () => {
     setProceed(true);
-    let temp = orders.map((order, index) => {
+    let temp = order["orders"].map((order, index) => {
       const newOrder = {
         storeID: STORE.storeID,
         productID: order["item"]._id,
@@ -238,16 +268,16 @@ function Dashboard({ signUp, user, products, refresh, categories }) {
 
                         if (item.stock - item.sold < 1) return null;
 
-                        if (orders) {
-                          isAdded = orders.filter((order) => {
+                        if (order["orders"]) {
+                          isAdded = order["orders"].filter((order) => {
                             return order["item"]["_id"] == item["_id"];
                           });
                         }
 
-                        let temp = [...orders];
+                        let temp = [...order["orders"]];
 
                         if (isAdded.length > 0) {
-                          let index = orders
+                          let index = order["orders"]
                             .map((order) => order["item"]._id)
                             .indexOf(item._id);
 
@@ -266,7 +296,7 @@ function Dashboard({ signUp, user, products, refresh, categories }) {
                           });
                         }
 
-                        setOrders(temp);
+                        updateOrder({ orders: temp });
                       }}
                       className={`${
                         item.stock - item.sold < 1 && "opacity-50"
@@ -330,10 +360,10 @@ function Dashboard({ signUp, user, products, refresh, categories }) {
           <div className="flex flex-col p-4 h-full w-full">
             <div className="flex flex-row justify-between items-center">
               <h1 className="font-lato-bold text-lg">Orders</h1>
-              {orders.length > 0 && (
+              {order["orders"].length > 0 && (
                 <p
                   onClick={() => {
-                    setOrders([]);
+                    updateOrder({ orders: [], bill: 0, change: 0 });
                   }}
                   className="text-sm cursor-pointer"
                 >
@@ -342,117 +372,135 @@ function Dashboard({ signUp, user, products, refresh, categories }) {
               )}
             </div>
 
-            <div className="w-full flex-1 flex flex-col overflow-hidden mb-3">
-              {orders.length < 1 ? (
+            <div className="w-full flex-1 flex flex-col overflow-hidden mb-3 border p-2 rounded-lg mt-2">
+              <div className="flex flex-row">
+                {tableItems.map((items, index) => {
+                  return (
+                    <p
+                      style={{ width: items.width }}
+                      className={`${
+                        !items.width && "flex-1"
+                      } font-lato-bold text-sm ${index == 2 && "text-end"}`}
+                    >
+                      {items.label}
+                    </p>
+                  );
+                })}
+              </div>
+              {order["orders"].length < 1 ? (
                 <div className="h-full w-full flex items-center justify-center">
                   <h1 className="text-center">Select an item to order.</h1>
                 </div>
               ) : (
-                <div className="h-full w-full flex flex-col px-2 py-2 overflow-auto gap-4">
-                  {orders.map((item, index) => {
+                <div className="h-full w-full flex flex-col px-1 py-2 overflow-auto gap-1">
+                  {order["orders"].map((item, index) => {
+                    let temp = [...order["orders"]];
+
+                    let newItem = temp[index];
+
                     return (
-                      <div className="flex flex-row h-14 items-center gap-2">
-                        <img
-                          src={item["item"].photoUrl}
-                          alt={item["item"].name}
-                          className="h-12 w-12 object-cover rounded-lg border shadow-sm"
-                        />
-                        <div className="flex-1 flex flex-col w-full text-sm">
-                          <h1 className="font-lato leading-none">
-                            {item["item"].name}
-                          </h1>
-                          <p className="font-lato-bold text-sm">
-                            {item["item"].price.toLocaleString("en-US", {
-                              style: "currency",
-                              currency: "PHP",
-                            })}
-                          </p>
+                      <div className="flex flex-row items-center">
+                        <div
+                          style={{
+                            width: tableItems[0].width,
+                          }}
+                          className="pr-2"
+                        >
+                          <input
+                            value={item.quantity}
+                            type="number"
+                            min={1}
+                            max={
+                              newItem["item"]["stock"] - newItem["item"]["sold"]
+                            }
+                            className="text-sm font-lato w-full"
+                            onChange={(e) => {
+                              newItem["quantity"] =
+                                parseInt(e.target.value) || 0;
+
+                              updateOrder({ orders: temp });
+                            }}
+                          />
                         </div>
-                        <div className="w-[80px]">
-                          <div
-                            className={`my-1 h-8 items-center flex flex-row max-w-min py-1 px-2 border rounded-[15px] shadow-sm select-none text-sm`}
-                          >
-                            <MinusIcon
-                              onClick={() => {
-                                let temp = [...orders];
 
-                                let newItem = temp[index];
-
-                                newItem["quantity"] = newItem["quantity"] - 1;
-
-                                if (newItem["quantity"] <= 0) {
-                                  temp.splice(index, 1);
-                                }
-
-                                setOrders(temp);
-                              }}
-                              className={`w-4 cursor-pointer text-[#1F2F3D]`}
-                            />
-                            <p className="w-8 bg-white text-center font-lato-bold">
-                              {item.quantity}
-                            </p>
-                            <PlusIcon
-                              onClick={() => {
-                                let temp = [...orders];
-
-                                let newItem = temp[index];
-
-                                if (
-                                  newItem["quantity"] <
-                                  newItem["item"]["stock"] -
-                                    newItem["item"]["sold"]
-                                ) {
-                                  newItem["quantity"] = newItem["quantity"] + 1;
-                                }
-
-                                setOrders(temp);
-                              }}
-                              className={`w-4 cursor-pointer text-[#1F2F3D]`}
-                            />
-                          </div>
-                        </div>
+                        <h1 className="font-lato leading-none flex-1 text-sm">
+                          {item["item"].name}
+                        </h1>
+                        <p
+                          style={{ width: tableItems[2].width }}
+                          className="font-lato text-sm text-end"
+                        >
+                          {item["item"].price * item["quantity"]}
+                        </p>
                       </div>
                     );
                   })}
                 </div>
               )}
             </div>
-            <div className="w-full h-[150px] flex flex-col px-8">
+            <div className="w-full h-[160px] flex flex-col px-2">
               <div className="flex flex-row justify-between">
-                <h1 className="text-sm font-lato-bold">Subtotal</h1>
+                <h1 className="text-sm font-lato-bold">Total No. of Items</h1>
                 <h1 className="text-sm font-lato-bold">
-                  {total.toLocaleString("en-US", {
-                    style: "currency",
-                    currency: "PHP",
-                  })}
+                  {order["totalItems"]}
                 </h1>
               </div>
               <div className="flex flex-row justify-between">
-                <h1 className="text-sm font-lato">Tax</h1>
-                <h1 className="text-sm font-lato">
-                  {[0].toLocaleString("en-US", {
+                <h1 className="text-sm font-lato-bold">Total Amount</h1>
+                <h1 className="text-sm font-lato-bold">
+                  {order["totalAmount"].toLocaleString("en-US", {
                     style: "currency",
                     currency: "PHP",
                   })}
                 </h1>
               </div>
               <div className="h-[1px] my-2 border border-b-[#555C68] border-dashed"></div>
+              <div className="flex flex-row justify-between items-center py-1">
+                <h1 className="text-sm font-lato-bold">Bill</h1>
+                <div className="flex flex-row items-center w-40 h-7 rounded-md focus:outline-none border border-[#555C68]/50 text-sm pl-2">
+                  <p className="text-[#555C68]/80">&#x20B1;</p>
+                  <input
+                    required
+                    value={order["bill"]}
+                    placeholder="0"
+                    min={0}
+                    type="number"
+                    onChange={(e) => {
+                      const value = parseFloat(e.target.value);
+                      const change = value - order["totalAmount"];
+                      updateOrder({
+                        bill: value,
+                        change: change < 0 ? 0 : change,
+                      });
+                    }}
+                    className="w-full h-8 focus:outline-none bg-transparent text-end"
+                  />
+                </div>
+              </div>
               <div className="flex flex-row justify-between">
-                <h1 className="text-base font-lato-bold">Total</h1>
-                <h1 className="text-base font-lato-bold">
-                  {total.toLocaleString("en-US", {
+                <h1 className="text-sm font-lato-bold">Change</h1>
+                <h1 className="text-sm font-lato-bold">
+                  {order["change"].toLocaleString("en-US", {
                     style: "currency",
                     currency: "PHP",
                   })}
                 </h1>
               </div>
               <button
-                disabled={orders.length < 1 || isProceed}
+                disabled={
+                  order["orders"].length < 1 ||
+                  isProceed ||
+                  order["bill"] < order["totalAmount"]
+                }
                 onClick={() => {
                   proceedOrder();
                 }}
-                className={`p-2 mt-4 ${
-                  orders.length < 1 ? "bg-[#ffc100]/40" : "bg-[#ffc100]"
+                className={`p-2 mt-3 ${
+                  order["orders"].length < 1 ||
+                  isProceed ||
+                  order["bill"] < order["totalAmount"]
+                    ? "bg-[#ffc100]/40"
+                    : "bg-[#ffc100]"
                 } rounded-lg w-full text-sm text-[#555C68] font-lato-bold`}
               >
                 {isProceed ? (
