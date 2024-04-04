@@ -65,14 +65,14 @@ function Dashboard({ signUp, user, products, refresh, categories }) {
 
   useEffect(() => {
     let tempS = 0;
-    var tempQ = 0;
+    let tempQ = 0;
     order["orders"].map((item) => {
       tempS += item["item"]["price"] * item["quantity"];
       tempQ += item["quantity"];
     });
 
     updateOrder({ totalAmount: tempS, totalItems: tempQ });
-  }, [order["orders"]]);
+  }, [order["orders"], orders, barcodeData]);
 
   const cat = useMemo(() => {
     var temp = [
@@ -108,7 +108,7 @@ function Dashboard({ signUp, user, products, refresh, categories }) {
       return products["groupProducts"][filter.category_name] || [];
 
     return products["products"];
-  }, [products["products"]]);
+  }, [products["products"], filter]);
 
   const search = (query) => {
     var temp = handleProducts;
@@ -248,6 +248,7 @@ function Dashboard({ signUp, user, products, refresh, categories }) {
       });
     }
 
+    setOrders(true);
     updateOrder({ orders: temp });
   };
 
@@ -335,7 +336,7 @@ function Dashboard({ signUp, user, products, refresh, categories }) {
           <div className="w-full h-full flex flex-col">
             <div className="flex flex-row w-full my-4 items-center lg:px-2 ">
               <div className="flex flex-row w-full gap-4">
-                <div className="w-[350px] flex flex-col">
+                <div className="w-[300px] flex flex-col">
                   <p className="font-lato-bold text-sm px-1 py-[2px]">Search</p>
                   <input
                     value={query}
@@ -370,6 +371,12 @@ function Dashboard({ signUp, user, products, refresh, categories }) {
                           selected={item.value == 0 && filter == 0}
                           id={item.id}
                           value={JSON.stringify(item.value)}
+                          onChange={() => {
+                            const value = JSON.parse(e.target.value);
+                            if (value == 0) return setFilter(0);
+
+                            setFilter(value);
+                          }}
                         >
                           {item.label}
                         </option>
