@@ -83,7 +83,6 @@ function Homepage() {
       .then((data) => {
         if (!data) return null;
 
-        console.log(data);
         setCategories({
           fetchState: data.length < 1 ? 2 : 1,
           categories: data.map((item, index) => {
@@ -253,6 +252,7 @@ function Homepage() {
           />
           <Dashboard
             products={products}
+            user={user}
             refresh={() => {
               fetchProduct();
             }}

@@ -52,8 +52,7 @@ function Dashboard({ sales, products, orders, customers }) {
 
   const getOrders = () => {
     setStats({
-      pending: !orders["orderGroup"][1] ? 0 : orders["orderGroup"][1].length,
-      completed: !orders["orderGroup"][2] ? 0 : orders["orderGroup"][2].length,
+      completed: !orders["orderGroup"][1] ? 0 : orders["orderGroup"][1].length,
     });
   };
 

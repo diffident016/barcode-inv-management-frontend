@@ -133,7 +133,7 @@ function AdminHomepage() {
     },
     {
       label: "Purchase",
-      component: <CompletedOrders orders={orders} refresh={() => {}} />,
+      component: <Purchase orders={orders} refresh={() => {}} />,
       icon: <ShoppingCartIcon />,
       header: "",
       count: orders["count"],

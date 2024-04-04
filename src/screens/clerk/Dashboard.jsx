@@ -3,13 +3,14 @@ import barcode from "../../assets/images/barcode.png";
 import { Backdrop, CircularProgress } from "@mui/material";
 import empty from "../../assets/images/no-products.svg";
 import error from "../../assets/images/error.svg";
-import { MinusIcon, PlusIcon } from "@heroicons/react/24/outline";
+import { TrashIcon } from "@heroicons/react/24/outline";
 
 import { STORE } from "../../../config";
 import ScanBarcode from "../../components/ScanBarcode";
-import { checkoutOrder } from "../../api/order_api";
+import { addOrder } from "../../api/order_api";
 import { useDispatch } from "react-redux";
 import { show } from "../../states/alerts";
+import { Close } from "@mui/icons-material";
 
 function Dashboard({ signUp, user, products, refresh, categories }) {
   const [query, setQuery] = useState("");
@@ -19,7 +20,6 @@ function Dashboard({ signUp, user, products, refresh, categories }) {
   const [scan, setScan] = useState(false);
   const [orders, setOrders] = useState([]);
   const [isProceed, setProceed] = useState(false);
-  const [total, setTotal] = useState(0);
 
   const dispatch = useDispatch();
 
@@ -49,6 +49,10 @@ function Dashboard({ signUp, user, products, refresh, categories }) {
       width: 60,
       label: "Amount",
     },
+    {
+      width: 40,
+      label: "",
+    },
   ];
 
   useEffect(() => {
@@ -60,7 +64,7 @@ function Dashboard({ signUp, user, products, refresh, categories }) {
     });
 
     updateOrder({ totalAmount: tempS, totalItems: tempQ });
-  }, [order]);
+  }, [order["orders"]]);
 
   const cat = useMemo(() => {
     var temp = [
@@ -131,26 +135,40 @@ function Dashboard({ signUp, user, products, refresh, categories }) {
     );
   };
 
+  const clearOrder = () => {
+    updateOrder({ orders: [], bill: 0, change: 0 });
+  };
+
   const proceedOrder = async () => {
-    setProceed(true);
-    let temp = order["orders"].map((order, index) => {
-      const newOrder = {
-        storeID: STORE.storeID,
-        productID: order["item"]._id,
-        product: order["item"],
-        quantity: order["quantity"],
-        orderDate: new Date(),
-        orderStatus: 2,
-        orderAmount: order["item"].price * order["quantity"],
+    //setProceed(true);
+
+    let products = order["orders"].map((product, index) => {
+      const orderProduct = {
+        product: product["item"],
+        quantity: product["quantity"],
+        amount: product["item"].price * product["quantity"],
       };
 
-      return newOrder;
+      return orderProduct;
     });
 
-    checkoutOrder(temp)
+    const newOrder = {
+      storeID: STORE.storeID,
+      clerkID: user._id,
+      clerk: user,
+      products: products,
+      totalItems: order["totalItems"],
+      totalAmount: order["totalAmount"],
+      bill: order["bill"],
+      change: order["change"],
+      orderDate: new Date(),
+      orderStatus: 1,
+    };
+
+    addOrder(newOrder)
       .then((res) => res.json())
       .then((_) => {
-        setOrders([]);
+        clearOrder();
         setProceed(false);
         dispatch(
           show({
@@ -356,14 +374,14 @@ function Dashboard({ signUp, user, products, refresh, categories }) {
             </div>
           )}
         </div>
-        <div className="w-[550px] h-full bg-white rounded-lg border">
+        <div className="w-[600px] h-full bg-white rounded-lg border">
           <div className="flex flex-col p-4 h-full w-full">
             <div className="flex flex-row justify-between items-center">
               <h1 className="font-lato-bold text-lg">Orders</h1>
               {order["orders"].length > 0 && (
                 <p
                   onClick={() => {
-                    updateOrder({ orders: [], bill: 0, change: 0 });
+                    clearOrder();
                   }}
                   className="text-sm cursor-pointer"
                 >
@@ -389,7 +407,9 @@ function Dashboard({ signUp, user, products, refresh, categories }) {
               </div>
               {order["orders"].length < 1 ? (
                 <div className="h-full w-full flex items-center justify-center">
-                  <h1 className="text-center">Select an item to order.</h1>
+                  <h1 className="text-center text-sm">
+                    Select or scan barcode an item to order.
+                  </h1>
                 </div>
               ) : (
                 <div className="h-full w-full flex flex-col px-1 py-2 overflow-auto gap-1">
@@ -432,6 +452,17 @@ function Dashboard({ signUp, user, products, refresh, categories }) {
                         >
                           {item["item"].price * item["quantity"]}
                         </p>
+                        <div
+                          style={{ width: tableItems[3].width }}
+                          onClick={() => {
+                            let temp = [...order["orders"]];
+                            temp.splice(index, 1);
+                            updateOrder({ orders: temp });
+                          }}
+                          className="flex items-center justify-center cursor-pointer select-none"
+                        >
+                          <Close fontSize="12px" />
+                        </div>
                       </div>
                     );
                   })}
