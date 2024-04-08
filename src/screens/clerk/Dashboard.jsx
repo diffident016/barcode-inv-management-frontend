@@ -72,7 +72,7 @@ function Dashboard({ signUp, user, products, refresh, categories }) {
     });
 
     updateOrder({ totalAmount: tempS, totalItems: tempQ });
-  }, [order["orders"], orders, barcodeData]);
+  }, [order["orders"],orders, barcodeData]);
 
   const cat = useMemo(() => {
     var temp = [
@@ -248,7 +248,7 @@ function Dashboard({ signUp, user, products, refresh, categories }) {
       });
     }
 
-    setOrders(true);
+    setOrders(orders+1);
     updateOrder({ orders: temp });
   };
 
@@ -561,6 +561,7 @@ function Dashboard({ signUp, user, products, refresh, categories }) {
                                 return;
 
                               updateOrder({ orders: temp });
+                              setOrders(orders+1);
                             }}
                           />
                         </div>
@@ -625,6 +626,7 @@ function Dashboard({ signUp, user, products, refresh, categories }) {
                         bill: value == 0 ? null : value,
                         change: change < 0 ? 0 : change,
                       });
+                      setOrders(orders+1);
                     }}
                     className="w-full h-8 focus:outline-none bg-transparent text-end"
                   />
@@ -641,22 +643,24 @@ function Dashboard({ signUp, user, products, refresh, categories }) {
               </div>
               <button
                 disabled={
-                  order["orders"].length < 1 ||
-                  isProceed ||
-                  order["bill"] < order["totalAmount"]
+                  order["orders"].length > 1 &&
+                  isProceed &&
+                  order["bill"] >= order["totalAmount"]
                 }
                 onClick={() => {
                   proceedOrder();
                 }}
                 className={`p-2 mt-3 ${
-                  order["orders"].length < 1 ||
-                  isProceed ||
-                  order["bill"] < order["totalAmount"]
-                    ? "bg-[#ffc100]/40"
-                    : "bg-[#ffc100]"
+                  order["orders"].length > 1 &&
+                  !isProceed &&
+                  order["bill"] >= order["totalAmount"]
+                    ? "bg-[#ffc100]"
+                    : "bg-[#ffc100]/40"
                 } rounded-lg w-full text-sm text-[#555C68] font-lato-bold`}
               >
-                {isProceed ? (
+                { 
+                  isProceed
+                  ? (
                   <div className="flex flex-row items-center justify-center gap-2">
                     <CircularProgress size={"16px"} color="inherit" />
                     <p className="text-sm">Processing order, please wait...</p>
