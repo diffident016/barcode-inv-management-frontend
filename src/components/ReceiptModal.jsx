@@ -97,10 +97,10 @@ const ReceiptModal = ({ order, close }) => {
                   <td className="w-full">{item.product.name}</td>
                   <td className="min-w-[50px] text-center">{item.quantity}</td>
                   <td className="min-w-[80px] text-right">
-                    ${Number(item.product.price).toFixed(2)}
+                    &#8369;{Number(item.product.price).toFixed(2)}
                   </td>
                   <td className="min-w-[90px] text-right">
-                    ${Number(item.amount).toFixed(2)}
+                    &#8369;{Number(item.amount).toFixed(2)}
                   </td>
                 </tr>
               ))}
