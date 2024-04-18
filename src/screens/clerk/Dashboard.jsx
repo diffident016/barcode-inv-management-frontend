@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useReducer } from "react";
+import React, { useState, useMemo, useEffect, useReducer, useRef } from "react";
 import barcode from "../../assets/images/barcode.png";
 import { Backdrop, CircularProgress } from "@mui/material";
 import empty from "../../assets/images/no-products.svg";
@@ -25,6 +25,8 @@ function Dashboard({ signUp, user, products, refresh, categories }) {
   const [isProceed, setProceed] = useState(false);
   const [barcodeData, setBarcode] = useState();
   const [scannedProduct, setProduct] = useState();
+
+  const myRef = useRef(null);
 
   let isTimeout = false;
   let tempBarcode = null;
@@ -62,6 +64,62 @@ function Dashboard({ signUp, user, products, refresh, categories }) {
       label: "",
     },
   ];
+
+  const handleBarcodeScan = (e) => {
+    if (!window.hasOwnProperty("scan")) {
+      window.scan = [];
+    }
+
+    if (
+      window.scan.length > 0 &&
+      e.timeStamp - window.scan.slice(-1)[0].timeStamp > 10
+    ) {
+      window.scan = [];
+    }
+
+    if (e.key === "Enter" && window.scan.length > 0) {
+      let scannedString = window.scan.reduce(function (scannedString, entry) {
+        return scannedString + entry.key;
+      }, "");
+      window.scan = [];
+
+      return document.dispatchEvent(
+        new CustomEvent("scanComplete", { detail: scannedString })
+      );
+    }
+
+    if (e.key !== "Shift") {
+      let data = JSON.parse(JSON.stringify(e, ["key", "timeStamp"]));
+
+      data.timeStampDiff =
+        window.scan.length > 0
+          ? data.timeStamp - window.scan.slice(-1)[0].timeStamp
+          : 0;
+
+      window.scan.push(data);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleBarcodeScan);
+
+    return () => {
+      document.removeEventListener("keydown", handleBarcodeScan);
+    };
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener("scanComplete", function (e) {
+      console.log(e.detail);
+      onNewScanResult(e.detail);
+    });
+
+    return () => {
+      document.removeEventListener("scanComplete", function (e) {
+        console.log(e.detail);
+      });
+    };
+  }, []);
 
   useEffect(() => {
     let tempS = 0;
@@ -276,63 +334,7 @@ function Dashboard({ signUp, user, products, refresh, categories }) {
   return (
     <div className="w-full h-full flex flex-col overflow-hidden mt-4">
       <div className="w-full h-full flex flex-row gap-4">
-        {scan ? (
-          <div className="relative w-full h-screen flex flex-col items-center justify-center ">
-            <div
-              onClick={() => {
-                setScan(false);
-              }}
-              className="absolute right-0 top-0 flex gap-2 cursor-pointer border border-[#555C68]/40 py-2 w-36 justify-center rounded-lg shadow-sm"
-            >
-              <XMarkIcon className="w-5" />
-              <h1 className="font-lato-bold text-sm">Close Scanner</h1>
-            </div>
-            <div className="w-[500px] h-[550px]">
-              <Html5QrcodePlugin
-                fps={15}
-                qrbox={250}
-                disableFlip={false}
-                qrCodeSuccessCallback={(result, _) => {
-                  onNewScanResult(result);
-                }}
-              />
-            </div>
-            {!barcodeData ? (
-              <div className="h-full py-4">
-                <p className="text-base font-lato-bold">Scan a barcode now.</p>
-              </div>
-            ) : scannedProduct ? (
-              <div className="flex-col w-full h-full p-4 justify-center items-center">
-                <div className="px-4 w-full flex flex-col items-center">
-                  <p className="">
-                    Barcode:{" "}
-                    <span className="font-lato-bold">
-                      {scannedProduct.barcode}
-                    </span>
-                  </p>
-                  <p>
-                    Product:{" "}
-                    <span className="font-lato-bold">
-                      {scannedProduct.name}
-                    </span>
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <div className="flex flex-col h-full p-4 justify-center items-center">
-                <div className="px-4 w-full h-full">
-                  <p className="pb-2">
-                    Barcode:{" "}
-                    <span className="font-lato-bold">{barcodeData}</span>
-                  </p>
-                  <p className="text-base font-lato-bold">
-                    No product found from this barcode.
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-        ) : (
+        {
           <div className="w-full h-full flex flex-col">
             <div className="flex flex-row w-full my-4 items-center lg:px-2 ">
               <div className="flex flex-row w-full gap-4">
@@ -400,7 +402,7 @@ function Dashboard({ signUp, user, products, refresh, categories }) {
                 </div>
               )}
 
-              <div className="flex-1 flex flex-col self-end items-end">
+              {/* <div className="flex-1 flex flex-col self-end items-end">
                 <div
                   onClick={() => {
                     setScan(true);
@@ -410,7 +412,7 @@ function Dashboard({ signUp, user, products, refresh, categories }) {
                   <img src={barcode} className="w-5" />
                   <h1 className="font-lato-bold text-sm">Scan Barcode</h1>
                 </div>
-              </div>
+              </div> */}
             </div>
 
             {products.fetchState != 1 ? (
@@ -487,7 +489,7 @@ function Dashboard({ signUp, user, products, refresh, categories }) {
               </div>
             )}
           </div>
-        )}
+        }
 
         <div className="w-[600px] h-full bg-white rounded-lg border">
           <div className="flex flex-col p-4 h-full w-full">

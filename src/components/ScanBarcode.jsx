@@ -1,7 +1,7 @@
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import React, { useState } from "react";
 import barcode from "../assets/images/barcode.png";
-import Html5QrcodePlugin from "./Html5QrcodePlugin";
+import BarcodeScannerComponent from "react-qr-barcode-scanner";
 
 function ScanBarcode({
   close,
@@ -14,17 +14,19 @@ function ScanBarcode({
   const [data, setData] = useState(null);
   const [scannedProduct, setProduct] = useState(null);
 
-  const handleScan = (result, _) => {
-    if (!!result && result != data) {
-      const product = products.find((product) => product.barcode === result);
+  const handleScan = (err, result) => {
+    if (!!result && result.text != data) {
+      const product = products.find(
+        (product) => product.barcode === result.text
+      );
 
       setProduct(product);
-      setData(result);
+      setData(result.text);
     }
   };
 
   return (
-    <div className="w-[400px] h-[550px] bg-white rounded-lg ">
+    <div className="w-[360px] h-[520px] bg-white rounded-lg ">
       <div className="w-full h-full flex flex-col text-[#555C68] font-lato">
         <div className="flex flex-row h-1 my-4 items-center justify-between px-4 py-2">
           <h1 className="flex gap-2 items-center text-sm font-lato-bold">
@@ -41,11 +43,11 @@ function ScanBarcode({
           />
         </div>
         <div className="w-[400px] h-[400px]">
-          <Html5QrcodePlugin
-            fps={15}
-            qrbox={280}
-            disableFlip={false}
-            qrCodeSuccessCallback={handleScan}
+          <BarcodeScannerComponent
+            width={360}
+            height={400}
+            stopStream={stream}
+            onUpdate={handleScan}
           />
         </div>
         <div className="flex py-2 justify-center items-center h-full w-full">

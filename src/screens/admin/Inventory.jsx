@@ -254,7 +254,7 @@ function Inventory({ user, products, refresh, categories }) {
               <ArrowsUpDownIcon className="w-5" />
               <h1 className="font-lato-bold text-sm">By Stock</h1>
             </div>
-            <div
+            {/* <div
               onClick={() => {
                 setScan(true);
               }}
@@ -262,7 +262,7 @@ function Inventory({ user, products, refresh, categories }) {
             >
               <img src={barcode} className="w-5" />
               <h1 className="font-lato-bold text-sm">Scan Barcode</h1>
-            </div>
+            </div> */}
             <h1
               onClick={() => {
                 setAddProduct({ add: true, barcode: null });
@@ -381,6 +381,7 @@ function Inventory({ user, products, refresh, categories }) {
                 close={() => {
                   setShowProduct(null);
                 }}
+                categories={categories}
               />
             )}
           </Backdrop>

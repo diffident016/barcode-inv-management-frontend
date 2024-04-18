@@ -1,4 +1,4 @@
-import React, { useState, useReducer, useRef, useMemo } from "react";
+import React, { useState, useReducer, useRef, useMemo, useEffect } from "react";
 import {
   PlusIcon,
   XMarkIcon,
@@ -228,6 +228,62 @@ function AddProduct({ close, refresh, barcode, categories, products }) {
     );
   };
 
+  const handleBarcodeScan = (e) => {
+    if (!window.hasOwnProperty("scan")) {
+      window.scan = [];
+    }
+
+    if (
+      window.scan.length > 0 &&
+      e.timeStamp - window.scan.slice(-1)[0].timeStamp > 10
+    ) {
+      window.scan = [];
+    }
+
+    if (e.key === "Enter" && window.scan.length > 0) {
+      let scannedString = window.scan.reduce(function (scannedString, entry) {
+        return scannedString + entry.key;
+      }, "");
+      window.scan = [];
+
+      return document.dispatchEvent(
+        new CustomEvent("scanComplete", { detail: scannedString })
+      );
+    }
+
+    if (e.key !== "Shift") {
+      let data = JSON.parse(JSON.stringify(e, ["key", "timeStamp"]));
+
+      data.timeStampDiff =
+        window.scan.length > 0
+          ? data.timeStamp - window.scan.slice(-1)[0].timeStamp
+          : 0;
+
+      window.scan.push(data);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleBarcodeScan);
+
+    return () => {
+      document.removeEventListener("keydown", handleBarcodeScan);
+    };
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener("scanComplete", function (e) {
+      console.log(e.detail);
+      updateProduct({ barcode: e.detail });
+    });
+
+    return () => {
+      document.removeEventListener("scanComplete", function (e) {
+        console.log(e.detail);
+      });
+    };
+  }, []);
+
   return (
     <div className="relative w-[500px] h-[540px] bg-white rounded-lg text-[#555C68]">
       {isAdding && (
@@ -341,7 +397,7 @@ function AddProduct({ close, refresh, barcode, categories, products }) {
                   <ArrowPathIcon className="w-4" />
                   <h1 className="font-lato-bold text-xs">Generate</h1>
                 </div>
-                <div
+                {/* <div
                   onClick={() => {
                     setScan(true);
                   }}
@@ -349,7 +405,7 @@ function AddProduct({ close, refresh, barcode, categories, products }) {
                 >
                   <img src={barcodeIcon} className="w-4 h-4" />
                   <h1 className="font-lato-bold text-xs">Scan Code</h1>
-                </div>
+                </div> */}
               </div>
             </div>
             <div className="flex-1 h-[100px] w-[200px] border border-[#555C68]/50 rounded-lg flex items-center justify-center">

@@ -9,7 +9,13 @@ import { useDispatch } from "react-redux";
 import { show } from "../../states/alerts";
 import PopupDialog from "../../components/PopupDialog";
 
-function ProductDetails({ product, close, refresh, inventory = true }) {
+function ProductDetails({
+  product,
+  close,
+  refresh,
+  inventory = true,
+  categories,
+}) {
   const [updateProduct, setUpdateProduct] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
   const dispatch = useDispatch();
@@ -190,6 +196,7 @@ function ProductDetails({ product, close, refresh, inventory = true }) {
               close={() => {
                 setUpdateProduct(null);
               }}
+              categories={categories}
             />
           )}
         </Backdrop>
