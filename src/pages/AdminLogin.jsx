@@ -38,16 +38,17 @@ function AdminLogin() {
     setOnLogin(true);
     setError("");
 
-    try {
-      await signin(email, password);
-
-      const user = await getUserData(currentUser.uid);
-      dispatch(login(user));
-      navigate("/admin");
-    } catch (e) {
-      setError("Invalid email or password.");
-      setOnLogin(false);
-    }
+    signin(email, password)
+      .then((value) => {
+        getUserData(value.user.uid).then((user) => {
+          dispatch(login(user));
+          navigate("/admin");
+        });
+      })
+      .catch((err) => {
+        setError("Invalid email or password.");
+        setOnLogin(false);
+      });
   };
 
   const handleReset = async (e) => {
@@ -191,7 +192,7 @@ function AdminLogin() {
                       setPassword(e.target.value);
                     }}
                   />
-                  <p
+                  {/* <p
                     onClick={() => {
                       setForgot(true);
                       setSent(false);
@@ -199,11 +200,11 @@ function AdminLogin() {
                     className="cursor-pointer self-end pt-2 text-sm"
                   >
                     Forgot Password?
-                  </p>
+                  </p> */}
                   <button
                     disabled={onLogin}
                     type="submit"
-                    className="mt-4 flex w-full h-10 bg-[#ffc100] rounded-lg justify-center items-center"
+                    className="mt-6 flex w-full h-10 bg-[#ffc100] rounded-lg justify-center items-center"
                   >
                     {onLogin ? (
                       <div className="flex flex-row items-center gap-4">
